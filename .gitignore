@@ -1,0 +1,12 @@
+node_modules
+.nuxt
+.output
+.env
+.env.*
+!.env.example
+!studio/.env.example
+dist
+.sanity
+.tmp-config
+studio/dist
+*.log

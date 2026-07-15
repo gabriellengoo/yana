@@ -1,17 +1,36 @@
 <script setup>
+const props = defineProps({
+  settings: {
+    type: Object,
+    default: () => ({})
+  }
+})
+
 const emit = defineEmits(['complete'])
-const word = ref('RHYANA')
+const frames = computed(() => {
+  const configured = props.settings?.frames?.filter(Boolean)
+  return configured?.length ? configured : ['RHYANA', 'RHYAN.', 'R.YAN.', '.YANA']
+})
+const word = ref(frames.value[0])
 
 onMounted(() => {
-  const frames = ['RHYANA', 'RHYAN.', 'R.YAN.', '.YANA']
-  frames.forEach((frame, index) => {
+  if (props.settings?.enabled === false) {
+    emit('complete')
+    return
+  }
+
+  const initialDelay = props.settings?.initialDelay ?? 650
+  const frameDuration = props.settings?.frameDuration ?? 520
+  const totalDuration = props.settings?.totalDuration ?? 3000
+
+  frames.value.forEach((frame, index) => {
     window.setTimeout(() => {
       word.value = frame
-    }, 650 + index * 520)
+    }, initialDelay + index * frameDuration)
   })
   window.setTimeout(() => {
     emit('complete')
-  }, 3000)
+  }, totalDuration)
 })
 </script>
 

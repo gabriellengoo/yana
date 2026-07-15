@@ -1,4 +1,4 @@
-import { imageField } from './fields.js'
+import { imageField, seoFields } from './fields.js'
 
 export default {
   name: 'poweredByYanaEntry',
@@ -21,7 +21,14 @@ export default {
       of: [imageField('image', 'Image')]
     },
     { name: 'externalLink', title: 'External Link', type: 'url' },
-    { name: 'order', title: 'Order', type: 'number' }
+    {
+      name: 'relatedProjects',
+      title: 'Related Projects',
+      type: 'array',
+      of: [{ type: 'reference', to: [{ type: 'project' }] }]
+    },
+    { name: 'order', title: 'Order', type: 'number' },
+    ...seoFields
   ],
   orderings: [
     {

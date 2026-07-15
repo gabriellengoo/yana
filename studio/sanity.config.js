@@ -21,9 +21,18 @@ export default defineConfig({
           .title('Content')
           .items([
             singleton(S, 'siteSettings', 'Site Settings'),
+            singleton(S, 'navigation', 'Navigation'),
+            singleton(S, 'homePage', 'Home Page'),
+            singleton(S, 'poweredByYanaPage', 'Powered By Yana Page'),
             singleton(S, 'infoPage', 'Info Page'),
             S.divider(),
-            ...S.documentTypeListItems().filter((item) => !['siteSettings', 'infoPage'].includes(item.getId()))
+            ...S.documentTypeListItems().filter((item) => ![
+              'siteSettings',
+              'navigation',
+              'homePage',
+              'poweredByYanaPage',
+              'infoPage'
+            ].includes(item.getId()))
           ])
     }),
     visionTool()

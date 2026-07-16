@@ -10,7 +10,7 @@ export default {
       name: 'wordmark',
       title: 'Header Wordmark',
       type: 'string',
-      initialValue: '.YANA',
+      initialValue: 'Yana Studios',
       description: 'The text logo shown in the fixed header.'
     },
     {
@@ -66,7 +66,7 @@ export default {
       name: 'openingAnimation',
       title: 'Opening Animation Settings',
       type: 'object',
-      description: 'Edit the word frames and timing for the opening screen.',
+      description: 'Controls the approved RHYANAS STU to YANA STUDIOS opening sequence.',
       fields: [
         {
           name: 'enabled',
@@ -79,28 +79,29 @@ export default {
           title: 'Frames',
           type: 'array',
           of: [{ type: 'string' }],
-          initialValue: ['RHYANA', 'RHYAN.', 'R.YAN.', '.YANA']
+          description: 'Reference text for editors. The coded animation uses the approved drop and reveal sequence.',
+          initialValue: ['RHYANAS STU', 'YANA STU', 'YANA STUDIOS']
         },
         {
           name: 'initialDelay',
           title: 'Initial Delay',
           type: 'number',
           description: 'Milliseconds before the first frame change.',
-          initialValue: 650
+          initialValue: 620
         },
         {
           name: 'frameDuration',
           title: 'Frame Duration',
           type: 'number',
           description: 'Milliseconds between each frame.',
-          initialValue: 520
+          initialValue: 560
         },
         {
           name: 'totalDuration',
           title: 'Total Duration',
           type: 'number',
           description: 'Milliseconds before the site is shown.',
-          initialValue: 3000
+          initialValue: 3800
         }
       ]
     },

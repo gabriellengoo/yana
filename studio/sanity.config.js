@@ -12,7 +12,7 @@ const singleton = (S, type, title) =>
 export default defineConfig({
   name: 'rhyana',
   title: 'Yana Studios / Rhyana',
-  projectId: process.env.SANITY_STUDIO_PROJECT_ID || 'your-project-id',
+  projectId: process.env.SANITY_STUDIO_PROJECT_ID || '3jsw2c0t',
   dataset: process.env.SANITY_STUDIO_DATASET || 'production',
   plugins: [
     structureTool({

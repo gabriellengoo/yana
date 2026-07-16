@@ -7,11 +7,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['complete'])
-const frames = computed(() => {
-  const configured = props.settings?.frames?.filter(Boolean)
-  return configured?.length ? configured : ['RHYANA', 'RHYAN.', 'R.YAN.', '.YANA']
-})
-const word = ref(frames.value[0])
+const phase = ref(0)
+const removableLetters = 6
 
 onMounted(() => {
   if (props.settings?.enabled === false) {
@@ -19,14 +16,14 @@ onMounted(() => {
     return
   }
 
-  const initialDelay = props.settings?.initialDelay ?? 650
-  const frameDuration = props.settings?.frameDuration ?? 520
-  const totalDuration = props.settings?.totalDuration ?? 3000
+  const initialDelay = props.settings?.initialDelay ?? 700
+  const stepDuration = props.settings?.stepDuration ?? 150
+  const totalDuration = props.settings?.totalDuration ?? 2100
 
-  frames.value.forEach((frame, index) => {
+  Array.from({ length: removableLetters }).forEach((_, index) => {
     window.setTimeout(() => {
-      word.value = frame
-    }, initialDelay + index * frameDuration)
+      phase.value = index + 1
+    }, initialDelay + index * stepDuration)
   })
   window.setTimeout(() => {
     emit('complete')
@@ -36,6 +33,12 @@ onMounted(() => {
 
 <template>
   <div class="intro-lockup">
-    <div class="intro-word" aria-live="polite">{{ word }}</div>
+    <div class="intro-word" :class="`intro-word--phase-${phase}`" aria-live="polite" aria-label="Yana Studios">
+      <span class="intro-mark">
+        <span class="intro-core">
+          <span class="intro-remove intro-remove--1">R</span><span class="intro-remove intro-remove--2">H</span><span>YANA</span><span class="intro-remove intro-remove--3">S</span><span class="intro-remove intro-remove--4">&nbsp;S</span><span class="intro-remove intro-remove--5">T</span><span class="intro-remove intro-remove--6">U</span>
+        </span>
+      </span>
+    </div>
   </div>
 </template>

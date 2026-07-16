@@ -16,7 +16,8 @@ export default {
       title: 'Introduction Statement',
       type: 'text',
       rows: 4,
-      description: 'The short statement shown on the homepage hero.'
+      description: 'The centered exhibition-style statement shown on the homepage.',
+      initialValue: 'Helping people and brands build emotional worlds and create cultural presence. Bringing ideas to life through production, creative operations and thoughtful execution.'
     },
     imageField('heroImage', 'Optional Hero Image'),
     {
@@ -35,7 +36,7 @@ export default {
       name: 'featuredLabel',
       title: 'Featured Section Label',
       type: 'string',
-      initialValue: 'Featured Work'
+      initialValue: 'Recent Work'
     },
     ...seoFields
   ],

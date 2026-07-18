@@ -51,13 +51,12 @@ const brandStyle = computed(() => ({
   '--color-brand': settings.value.primaryBrandColour || '#002366'
 }))
 const wordmark = computed(() => settings.value.wordmark === '.YANA' ? 'Yana Studios' : settings.value.wordmark || 'Yana Studios')
-const menuRouteLoading = useState('menuRouteLoading', () => false)
 </script>
 
 <template>
   <div class="site-shell" :style="brandStyle">
     <SiteHeader :wordmark="wordmark" :links="links" />
-    <main class="site-main" :class="{ 'is-menu-loading': menuRouteLoading }">
+    <main class="site-main">
       <slot />
     </main>
     <footer v-if="settings.footerText" class="site-footer">

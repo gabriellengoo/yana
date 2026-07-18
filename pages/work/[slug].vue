@@ -18,9 +18,22 @@ if (!currentProject.value) {
 
 const mainImageUrl = computed(() => currentProject.value.mainImageUrl || sanityImage(currentProject.value.mainImage))
 const gallery = computed(() => currentProject.value.galleryImageUrls || (currentProject.value.galleryImages || []).map((image) => sanityImage(image)).filter(Boolean))
+const placeholderProjectBlocks = [
+  {
+    _key: 'placeholder-project-context',
+    blockType: 'textSection',
+    body: 'Placeholder paragraph for shaping project context, pacing and editorial rhythm. This space can hold background, process notes, production details or a short reflection on how the work came together.'
+  },
+  {
+    _key: 'placeholder-project-process',
+    blockType: 'textSection',
+    body: 'A second placeholder paragraph for testing longer project pages. Use this area to check how copy sits between image sections, paired media and full-page visual moments.'
+  }
+]
+const projectContentBlocks = computed(() => currentProject.value.contentBlocks?.length ? currentProject.value.contentBlocks : placeholderProjectBlocks)
 const projectParagraph = computed(() => {
   const project = currentProject.value
-  const description = project.fullDescription || project.shortDescription
+  const description = project.fullDescription || project.shortDescription || 'Placeholder project introduction for styling the opening paragraph, project details and image rhythm before final copy is published.'
   const info = [
     project.client ? `Client: ${project.client}` : '',
     project.year || project.date ? `Date: ${project.year || project.date}` : '',
@@ -48,7 +61,7 @@ useSeo({
     <figure v-if="mainImageUrl" class="project-full-bleed-image">
       <img :src="mainImageUrl" :alt="currentProject.mainImage?.alt || currentProject.title" />
     </figure>
-    <ProjectContentBlocks :blocks="currentProject.contentBlocks || []" />
+    <ProjectContentBlocks :blocks="projectContentBlocks" />
     <section v-if="currentProject.videoUrl" class="project-video-block">
       <iframe class="video-frame" :src="currentProject.videoUrl" :title="currentProject.title" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen />
     </section>

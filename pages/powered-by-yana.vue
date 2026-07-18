@@ -30,6 +30,9 @@ const page = computed(() => ({
   ...placeholderPages.poweredByYana,
   ...(data.value?.page || {})
 }))
+const poweredIntro = `PBY is our culturally observant in-house creative lab. A home for original ideas, experiences and cultural projects developed and produced by the studio. These are the concepts we create because we believe they deserve to exist.
+
+Exploring movement, fashion, image and cultural storytelling through creative production and strong visual direction.`
 const projects = computed(() => {
   const publishedProjects = (page.value.selectedProjects?.length ? page.value.selectedProjects : data.value?.fallbackProjects || []).map((project) => ({
     ...project,
@@ -78,6 +81,7 @@ useSeo({
 
 <template>
   <section class="page-pad powered-page">
+    <p class="powered-intro rich-text">{{ poweredIntro }}</p>
     <div v-if="poweredItems.length" class="powered-list">
       <article v-for="item in poweredItems" :key="item._id" class="powered-item">
         <component

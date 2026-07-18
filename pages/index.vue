@@ -73,6 +73,9 @@ useSeo({
   <section v-if="showIntro" class="intro-page">
     <IntroAnimation :settings="{ initialDelay: 700, totalDuration: 1800 }" @complete="completeIntro" />
   </section>
+  <section class="home-statement home-statement--landing">
+    <p>Helping people and brands build emotional worlds and create cultural presence. Bringing ideas to life through production, creative operations and thoughtful execution.</p>
+  </section>
   <section class="home-work landing-work" aria-label="Recent work">
     <article v-for="(project, index) in loopedProjects" :key="homeProjectKey(project, index)" class="home-work-item">
       <NuxtLink class="home-work-media" :to="project.slug ? `/work/${project.slug}` : '/work'">

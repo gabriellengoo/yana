@@ -47,7 +47,7 @@ const counterText = computed(() => `${activeIndex.value + 1} / ${projectCount.va
     </span>
     <button class="project-click-carousel__hit project-click-carousel__hit--next" type="button" aria-label="Next project" @click="showNext" />
     <div class="project-click-carousel__meta">
-      <NuxtLink v-if="activeProject.slug" class="project-click-carousel__view" :to="`/work/${activeProject.slug}`">View</NuxtLink>
+      <NuxtLink v-if="activeProject.slug" class="project-click-carousel__view" :to="`/work/${activeProject.slug}`">{{ activeProject.title }}</NuxtLink>
       <span class="project-click-carousel__counter">{{ counterText }}</span>
     </div>
   </div>

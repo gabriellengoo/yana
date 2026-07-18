@@ -41,7 +41,7 @@ useSeo({
 </script>
 
 <template>
-  <section class="page-pad">
+  <section class="page-pad world-building-page">
     <div class="page-heading">
       <h1>{{ page.title || 'World Building' }}</h1>
       <p v-if="page.introduction">{{ page.introduction }}</p>

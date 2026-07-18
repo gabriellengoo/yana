@@ -12,13 +12,6 @@ const content = computed(() => page.value || {
   title: 'Ways to Work Better*',
   introduction: 'Placeholder service structure for styling anchor sections, navigation states and page spacing.'
 })
-const services = [
-  { id: 'embedded-producer', title: 'Embedded Producer' },
-  { id: 'campaign-production', title: 'Campaign Production' },
-  { id: 'creative-operations', title: 'Creative Operations' },
-  { id: 'creative-direction', title: 'Creative Direction' },
-  { id: 'movement-direction-intimacy-coordination', title: 'Movement Direction / Intimacy Coordination' }
-]
 
 useSeo({
   title: content.value.seoTitle || content.value.title || 'Ways to Work Better',
@@ -36,7 +29,9 @@ useSeo({
     </div>
     <div class="service-anchor-list">
       <section v-for="service in services" :id="service.id" :key="service.id" class="service-anchor">
-        <h2>{{ service.title }}</h2>
+        <NuxtLink :to="`/ways-to-work-better/${service.id}`">
+          <h2>{{ service.title }}</h2>
+        </NuxtLink>
       </section>
     </div>
   </section>

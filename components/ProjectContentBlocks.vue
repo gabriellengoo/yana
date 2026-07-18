@@ -31,7 +31,6 @@ const linkTarget = (link) => {
       <template v-else-if="block.blockType === 'pullQuote'">
         <blockquote class="pull-quote">
           <p>{{ block.body }}</p>
-          <cite v-if="block.caption">{{ block.caption }}</cite>
         </blockquote>
       </template>
 
@@ -56,7 +55,6 @@ const linkTarget = (link) => {
           allow="autoplay; fullscreen; picture-in-picture"
           allowfullscreen
         />
-        <p v-if="block.caption" class="project-description">{{ block.caption }}</p>
       </template>
 
       <template v-else-if="block.blockType === 'twoColumnMedia' || block.blockType === 'portraitLandscapePairing'">
@@ -68,7 +66,6 @@ const linkTarget = (link) => {
             <img :src="imageUrl(block.secondaryImage)" :alt="block.secondaryImage?.alt || block.heading || ''" loading="lazy" />
           </figure>
         </div>
-        <p v-if="block.caption" class="project-description">{{ block.caption }}</p>
       </template>
 
       <template v-else-if="block.blockType === 'threeImageRow' || block.blockType === 'imageGallery'">
@@ -77,7 +74,6 @@ const linkTarget = (link) => {
             <img v-if="imageUrl(image)" :src="imageUrl(image)" :alt="image.alt || block.heading || ''" loading="lazy" />
           </figure>
         </div>
-        <p v-if="block.caption" class="project-description">{{ block.caption }}</p>
       </template>
 
       <template v-else-if="block.blockType === 'externalLink'">
@@ -95,7 +91,6 @@ const linkTarget = (link) => {
       <template v-else>
         <figure v-if="imageUrl(block.image)" class="content-image">
           <img :src="imageUrl(block.image)" :alt="block.image?.alt || block.heading || ''" loading="lazy" />
-          <figcaption v-if="block.caption">{{ block.caption }}</figcaption>
         </figure>
         <div v-if="block.heading || block.body" class="content-text">
           <h2 v-if="block.heading">{{ block.heading }}</h2>

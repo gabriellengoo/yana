@@ -26,15 +26,47 @@ const query = `{
 }`
 
 const { data } = await useAsyncData('powered-by-yana', () => fetchSanity(query))
-const page = computed(() => data.value?.page || {})
-const projects = computed(() => (page.value.selectedProjects?.length ? page.value.selectedProjects : data.value?.fallbackProjects || []).map((project) => ({
-  ...project,
-  mainImageUrl: sanityImage(project.thumbnail) || sanityImage(project.mainImage)
-})))
-const entries = computed(() => (data.value?.entries || []).map((entry) => ({
-  ...entry,
-  imageUrl: sanityImage(entry.images?.[0])
-})))
+const page = computed(() => ({
+  ...placeholderPages.poweredByYana,
+  ...(data.value?.page || {})
+}))
+const projects = computed(() => {
+  const publishedProjects = (page.value.selectedProjects?.length ? page.value.selectedProjects : data.value?.fallbackProjects || []).map((project) => ({
+    ...project,
+    mainImageUrl: sanityImage(project.thumbnail) || sanityImage(project.mainImage)
+  }))
+
+  return publishedProjects.length ? publishedProjects : placeholderProjects
+})
+const entries = computed(() => {
+  const publishedEntries = (data.value?.entries || []).map((entry) => ({
+    ...entry,
+    imageUrl: sanityImage(entry.images?.[0])
+  })).filter((entry) => entry.imageUrl)
+
+  return publishedEntries.length ? publishedEntries : placeholderInitiatives
+})
+const poweredItems = computed(() => {
+  if (entries.value.length) {
+    return entries.value.map((entry) => ({
+      _id: entry._id,
+      title: entry.title,
+      text: entry.description || entry.date || entry.title,
+      imageUrl: entry.imageUrl,
+      imageAlt: entry.images?.[0]?.alt || entry.title,
+      href: entry.externalLink
+    }))
+  }
+
+  return projects.value.map((project) => ({
+    _id: project._id,
+    title: project.title,
+    text: project.shortDescription || project.service || project.title,
+    imageUrl: project.mainImageUrl,
+    imageAlt: project.title,
+    href: project.slug ? `/work/${project.slug}` : ''
+  }))
+})
 
 useSeo({
   title: page.value.seoTitle || page.value.title || 'Powered By Yana',
@@ -45,45 +77,21 @@ useSeo({
 </script>
 
 <template>
-  <section class="page-pad">
-    <div class="page-heading">
-      <h1>{{ page.title || 'Powered By Yana' }}</h1>
-      <p v-if="page.introduction">{{ page.introduction }}</p>
-    </div>
-    <div v-if="page.sections?.length" class="info-grid page-sections">
-      <section v-for="section in page.sections" :key="section._key">
-        <div v-if="section.heading" class="section-label">{{ section.heading }}</div>
-        <p v-if="section.body" class="rich-text">{{ section.body }}</p>
-      </section>
-    </div>
-    <div v-if="projects.length" class="related-projects">
-      <ProjectCard v-for="project in projects" :key="project._id" :project="project" />
-    </div>
-    <div v-if="entries.length" class="initiative-grid">
-      <article v-for="entry in entries" :key="entry._id" class="initiative-card">
-        <div class="initiative-thumb">
-          <img v-if="entry.imageUrl" :src="entry.imageUrl" :alt="entry.images?.[0]?.alt || entry.title" loading="lazy" />
-        </div>
-        <div class="project-meta">
-          <div class="project-kicker">{{ entry.date || 'Undated' }}</div>
-          <h2 class="project-title">{{ entry.title }}</h2>
-          <p v-if="entry.description" class="project-description">{{ entry.description }}</p>
-          <a v-if="entry.externalLink" class="project-kicker" :href="entry.externalLink" target="_blank" rel="noreferrer">External Link</a>
-        </div>
+  <section class="page-pad powered-page">
+    <div v-if="poweredItems.length" class="powered-list">
+      <article v-for="item in poweredItems" :key="item._id" class="powered-item">
+        <component
+          :is="item.href ? 'a' : 'div'"
+          class="powered-item__image"
+          :href="item.href || undefined"
+          :target="item.href?.startsWith('http') ? '_blank' : undefined"
+          :rel="item.href?.startsWith('http') ? 'noreferrer' : undefined"
+        >
+          <img v-if="item.imageUrl" :src="item.imageUrl" :alt="item.imageAlt" loading="lazy" />
+        </component>
+        <p class="powered-item__text">{{ item.text }}</p>
       </article>
     </div>
-    <div v-if="page.callsToAction?.length" class="cta-row">
-      <a
-        v-for="cta in page.callsToAction"
-        :key="cta._key"
-        class="project-kicker"
-        :href="cta.linkType === 'external' ? cta.externalUrl : cta.internalPath"
-        :target="cta.openInNewTab ? '_blank' : undefined"
-        :rel="cta.openInNewTab ? 'noreferrer' : undefined"
-      >
-        {{ cta.label }}
-      </a>
-    </div>
-    <div v-if="!entries.length && !projects.length" class="empty-state">Powered By Yana entries will appear here when published.</div>
+    <div v-else class="empty-state">Powered By Yana entries will appear here when published.</div>
   </section>
 </template>

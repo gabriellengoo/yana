@@ -5,7 +5,10 @@ const query = `*[_type == "infoPage"][0]{
 }`
 
 const { data: info } = await useAsyncData('info-page', () => fetchSanity(query))
-const page = computed(() => info.value || {})
+const page = computed(() => ({
+  ...placeholderPages.info,
+  ...(info.value || {})
+}))
 
 useSeo({ title: page.value.title || 'Info', description: page.value.bio || 'Bio, contact, services, clients and collaborators for Yana Studios.', path: '/info' })
 </script>

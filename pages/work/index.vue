@@ -8,15 +8,25 @@ const query = `{
     socialImage
   },
   "projects": *[_type == "project"] | order(order asc, date desc){
-    _id, title, date, year,
+    _id, title, date, year, mainImage, thumbnail,
     "slug": slug.current,
     "service": coalesce(services[0]->title, service->title, role)
   }
 }`
 
 const { data } = await useAsyncData('work-projects', () => fetchSanity(query))
-const projects = computed(() => data.value?.projects || [])
-const page = computed(() => data.value?.page || {})
+const projects = computed(() => {
+  const publishedProjects = (data.value?.projects || []).map((project) => ({
+    ...project,
+    mainImageUrl: sanityImage(project.thumbnail) || sanityImage(project.mainImage)
+  })).filter((project) => project.mainImageUrl)
+
+  return publishedProjects.length ? publishedProjects : placeholderProjects
+})
+const page = computed(() => data.value?.page || {
+  title: 'Work',
+  introduction: 'Placeholder archive entries for styling project list states.'
+})
 
 useSeo({
   title: page.value.seoTitle || page.value.title || 'Work',
@@ -27,11 +37,7 @@ useSeo({
 </script>
 
 <template>
-  <section class="page-pad">
-    <div class="page-heading">
-      <h1>{{ page.title || 'Work' }}</h1>
-      <p v-if="page.introduction">{{ page.introduction }}</p>
-    </div>
-    <ProjectList :projects="projects" />
+  <section class="work-carousel-page">
+    <ProjectList :projects="projects" carousel />
   </section>
 </template>

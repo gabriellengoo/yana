@@ -8,7 +8,10 @@ const query = `*[_type == "sitePage" && path == "/ways-to-work-better"][0]{
 }`
 
 const { data: page } = await useAsyncData('ways-to-work-better-page', () => fetchSanity(query))
-const content = computed(() => page.value || {})
+const content = computed(() => page.value || {
+  title: 'Ways to Work Better*',
+  introduction: 'Placeholder service structure for styling anchor sections, navigation states and page spacing.'
+})
 const services = [
   { id: 'embedded-producer', title: 'Embedded Producer' },
   { id: 'campaign-production', title: 'Campaign Production' },

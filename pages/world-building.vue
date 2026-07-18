@@ -19,11 +19,18 @@ const query = `{
 }`
 
 const { data } = await useAsyncData('world-building-page', () => fetchSanity(query))
-const page = computed(() => data.value?.page || {})
-const posts = computed(() => (data.value?.posts || []).map((post) => ({
-  ...post,
-  imageUrl: sanityImage(post.coverMedia)
-})))
+const page = computed(() => ({
+  ...placeholderPages.worldBuilding,
+  ...(data.value?.page || {})
+}))
+const posts = computed(() => {
+  const publishedPosts = (data.value?.posts || []).map((post) => ({
+    ...post,
+    imageUrl: sanityImage(post.coverMedia)
+  }))
+
+  return publishedPosts.length ? publishedPosts : placeholderWorldPosts
+})
 
 useSeo({
   title: page.value.seoTitle || page.value.title || 'World Building',

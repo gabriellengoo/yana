@@ -15,11 +15,18 @@ const query = `{
 }`
 
 const { data } = await useAsyncData('gallery-entries', () => fetchSanity(query))
-const page = computed(() => data.value?.page || {})
-const entries = computed(() => (data.value?.entries || []).map((entry) => ({
-  ...entry,
-  imageUrl: sanityImage(entry.image)
-})))
+const page = computed(() => ({
+  ...placeholderPages.gallery,
+  ...(data.value?.page || {})
+}))
+const entries = computed(() => {
+  const publishedEntries = (data.value?.entries || []).map((entry) => ({
+    ...entry,
+    imageUrl: sanityImage(entry.image)
+  })).filter((entry) => entry.imageUrl)
+
+  return publishedEntries.length ? publishedEntries : placeholderGalleryEntries
+})
 
 useSeo({
   title: page.value.seoTitle || page.value.title || 'Gallery',

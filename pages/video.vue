@@ -15,11 +15,18 @@ const query = `{
 }`
 
 const { data } = await useAsyncData('video-entries', () => fetchSanity(query))
-const page = computed(() => data.value?.page || {})
-const videos = computed(() => (data.value?.videos || []).map((video) => ({
-  ...video,
-  thumbnailUrl: sanityImage(video.thumbnail)
-})))
+const page = computed(() => ({
+  ...placeholderPages.video,
+  ...(data.value?.page || {})
+}))
+const videos = computed(() => {
+  const publishedVideos = (data.value?.videos || []).map((video) => ({
+    ...video,
+    thumbnailUrl: sanityImage(video.thumbnail)
+  }))
+
+  return publishedVideos.length ? publishedVideos : placeholderVideos
+})
 
 useSeo({
   title: page.value.seoTitle || page.value.title || 'Video',

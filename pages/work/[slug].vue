@@ -1,5 +1,10 @@
 <script setup>
+definePageMeta({
+  key: (route) => route.fullPath
+})
+
 const route = useRoute()
+const slug = computed(() => String(route.params.slug || ''))
 const query = `*[_type == "project" && slug.current == $slug][0]{
   _id, title, date, year, client, location, role, roles,
   "service": coalesce(services[0]->title, service->title),
@@ -8,8 +13,12 @@ const query = `*[_type == "project" && slug.current == $slug][0]{
   contentBlocks
 }`
 
-const { data: project } = await useAsyncData(`project-${route.params.slug}`, () => fetchSanity(query, { slug: route.params.slug }))
-const fallbackProject = computed(() => placeholderProjects.find((item) => item.slug === route.params.slug))
+const { data: project } = await useAsyncData(
+  () => `project-${slug.value}`,
+  () => fetchSanity(query, { slug: slug.value }),
+  { watch: [slug] }
+)
+const fallbackProject = computed(() => placeholderProjects.find((item) => item.slug === slug.value))
 const currentProject = computed(() => project.value || fallbackProject.value)
 
 if (!currentProject.value) {
@@ -49,7 +58,7 @@ useSeo({
   title: currentProject.value.seoTitle || currentProject.value.title,
   description: currentProject.value.seoDescription || currentProject.value.shortDescription || 'Project page for Yana Studios.',
   image: sanityImage(currentProject.value.socialImage) || mainImageUrl.value,
-  path: route.path
+  path: `/work/${slug.value}`
 })
 </script>
 

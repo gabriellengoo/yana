@@ -13,20 +13,16 @@ const query = `*[_type == "project" && slug.current == $slug][0]{
   contentBlocks
 }`
 
-const { data: project } = await useAsyncData(
-  () => `project-${slug.value}`,
+const { data: project, pending } = await useAsyncData(
+  `project-${slug.value}`,
   () => fetchSanity(query, { slug: slug.value }),
   { watch: [slug] }
 )
 const fallbackProject = computed(() => placeholderProjects.find((item) => item.slug === slug.value))
 const currentProject = computed(() => project.value || fallbackProject.value)
 
-if (!currentProject.value) {
-  throw createError({ statusCode: 404, statusMessage: 'Project not found' })
-}
-
-const mainImageUrl = computed(() => currentProject.value.mainImageUrl || sanityImage(currentProject.value.mainImage))
-const gallery = computed(() => currentProject.value.galleryImageUrls || (currentProject.value.galleryImages || []).map((image) => sanityImage(image)).filter(Boolean))
+const mainImageUrl = computed(() => currentProject.value?.mainImageUrl || sanityImage(currentProject.value?.mainImage))
+const gallery = computed(() => currentProject.value?.galleryImageUrls || (currentProject.value?.galleryImages || []).map((image) => sanityImage(image)).filter(Boolean))
 const placeholderProjectBlocks = [
   {
     _key: 'placeholder-project-context',
@@ -39,9 +35,14 @@ const placeholderProjectBlocks = [
     body: 'A second placeholder paragraph for testing longer project pages. Use this area to check how copy sits between image sections, paired media and full-page visual moments.'
   }
 ]
-const projectContentBlocks = computed(() => currentProject.value.contentBlocks?.length ? currentProject.value.contentBlocks : placeholderProjectBlocks)
+const projectContentBlocks = computed(() => {
+  if (!currentProject.value) return []
+  return currentProject.value.contentBlocks?.length ? currentProject.value.contentBlocks : placeholderProjectBlocks
+})
 const projectParagraph = computed(() => {
   const project = currentProject.value
+  if (!project) return ''
+
   const description = project.fullDescription || project.shortDescription || 'Placeholder project introduction for styling the opening paragraph, project details and image rhythm before final copy is published.'
   const info = [
     project.client ? `Client: ${project.client}` : '',
@@ -55,15 +56,15 @@ const projectParagraph = computed(() => {
   return [description, info].filter(Boolean).join(' ')
 })
 useSeo({
-  title: currentProject.value.seoTitle || currentProject.value.title,
-  description: currentProject.value.seoDescription || currentProject.value.shortDescription || 'Project page for Yana Studios.',
-  image: sanityImage(currentProject.value.socialImage) || mainImageUrl.value,
+  title: currentProject.value?.seoTitle || currentProject.value?.title || 'Project',
+  description: currentProject.value?.seoDescription || currentProject.value?.shortDescription || 'Project page for Yana Studios.',
+  image: sanityImage(currentProject.value?.socialImage) || mainImageUrl.value,
   path: `/work/${slug.value}`
 })
 </script>
 
 <template>
-  <article class="project-detail">
+  <article v-if="currentProject" class="project-detail">
     <section class="project-detail-intro">
       <p v-if="projectParagraph" class="project-detail-copy rich-text">{{ projectParagraph }}</p>
     </section>
@@ -80,4 +81,8 @@ useSeo({
       </figure>
     </section>
   </article>
+  <section v-else-if="pending" class="project-detail project-detail-intro" aria-live="polite" />
+  <section v-else class="project-detail project-detail-intro">
+    <p class="project-detail-copy rich-text">Project not found.</p>
+  </section>
 </template>

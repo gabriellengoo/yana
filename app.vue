@@ -1,7 +1,11 @@
+<script setup>
+const route = useRoute()
+</script>
+
 <template>
   <NuxtLayout>
     <PageTransition>
-      <NuxtPage />
+      <NuxtPage :key="route.fullPath" />
     </PageTransition>
   </NuxtLayout>
 </template>

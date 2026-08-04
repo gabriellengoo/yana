@@ -14,7 +14,7 @@ const query = `{
   }
 }`
 
-const { data } = await useAsyncData('home-content', () => fetchSanity(query))
+const { data } = await useFreshSanityData('home-content', () => fetchSanity(query))
 const settings = computed(() => data.value?.settings || {})
 const home = computed(() => data.value?.home || {
   title: 'Yana Studios',

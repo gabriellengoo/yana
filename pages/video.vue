@@ -14,7 +14,7 @@ const query = `{
   }
 }`
 
-const { data } = await useAsyncData('video-entries', () => fetchSanity(query))
+const { data } = await useFreshSanityData('video-entries', () => fetchSanity(query))
 const page = computed(() => ({
   ...placeholderPages.video,
   ...(data.value?.page || {})

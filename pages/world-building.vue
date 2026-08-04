@@ -18,7 +18,7 @@ const query = `{
   }
 }`
 
-const { data } = await useAsyncData('world-building-page', () => fetchSanity(query))
+const { data } = await useFreshSanityData('world-building-page', () => fetchSanity(query))
 const page = computed(() => ({
   ...placeholderPages.worldBuilding,
   ...(data.value?.page || {})

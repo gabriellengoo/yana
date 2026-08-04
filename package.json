@@ -9,7 +9,10 @@
     "preview": "nuxt preview",
     "generate": "nuxt generate",
     "studio:dev": "sanity dev",
-    "studio:build": "sanity build"
+    "studio:build": "sanity build",
+    "sanity:upload-images": "node scripts/uploadSanityImages.mjs",
+    "sanity:attach-assets": "node scripts/attachSanityAssetsToProject.mjs",
+    "sanity:sync-folder-projects": "node scripts/syncSanityFolderProjects.mjs"
   },
   "dependencies": {
     "@nuxtjs/sitemap": "^7.4.7",

@@ -25,7 +25,7 @@ const query = `{
   }
 }`
 
-const { data } = await useAsyncData('powered-by-yana', () => fetchSanity(query))
+const { data } = await useFreshSanityData('powered-by-yana', () => fetchSanity(query))
 const page = computed(() => ({
   ...placeholderPages.poweredByYana,
   ...(data.value?.page || {})

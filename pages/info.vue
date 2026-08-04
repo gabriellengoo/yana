@@ -4,7 +4,7 @@ const query = `*[_type == "infoPage"][0]{
   newsletterLink, inviteInformation, sections
 }`
 
-const { data: info } = await useAsyncData('info-page', () => fetchSanity(query))
+const { data: info } = await useFreshSanityData('info-page', () => fetchSanity(query))
 const page = computed(() => ({
   ...placeholderPages.info,
   ...(info.value || {})

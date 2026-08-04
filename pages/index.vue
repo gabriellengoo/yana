@@ -25,7 +25,7 @@ const query = `{
       thumbnail
     }
   },
-  "fallbackProjects": *[_type == "project" && featuredOnHome == true] | order(coalesce(homeOrder, order) asc, date desc)[0...3]{
+  "allProjects": *[_type == "project"] | order(coalesce(homeOrder, order) asc, date desc){
     _id,
     title,
     date,
@@ -39,17 +39,23 @@ const query = `{
   }
 }`
 
-const { data } = await useAsyncData('landing-content', () => fetchSanity(query))
+const { data } = await useFreshSanityData('landing-content', () => fetchSanity(query))
 const settings = computed(() => data.value?.settings || {})
 const home = computed(() => data.value?.home || {})
 const projects = computed(() => {
-  const publishedProjects = (home.value.featuredProjects?.length ? home.value.featuredProjects : data.value?.fallbackProjects || []).filter(Boolean)
+  const selectedProjects = (home.value.featuredProjects || []).filter(Boolean)
+  const allProjects = (data.value?.allProjects || []).filter(Boolean)
+  const selectedIds = new Set(selectedProjects.map((project) => project._id))
+  const publishedProjects = [
+    ...selectedProjects,
+    ...allProjects.filter((project) => !selectedIds.has(project._id))
+  ]
   const sourceProjects = publishedProjects.length ? publishedProjects : placeholderProjects
 
-  return sourceProjects.slice(0, 3).map((project) => ({
+  return sourceProjects.map((project) => ({
     ...project,
     mainImageUrl: project.mainImageUrl || sanityImage(project.thumbnail) || sanityImage(project.mainImage)
-  }))
+  })).filter((project) => project.mainImageUrl)
 })
 const loopedProjects = computed(() => Array.from({ length: 12 }, () => projects.value).flat())
 const firstProjectImage = computed(() => projects.value[0]?.mainImageUrl)

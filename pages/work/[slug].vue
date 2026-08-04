@@ -13,13 +13,32 @@ const query = `*[_type == "project" && slug.current == $slug][0]{
   contentBlocks
 }`
 
-const { data: project, pending } = await useAsyncData(
+const { data: project, pending } = await useFreshSanityData(
   `project-${slug.value}`,
   () => fetchSanity(query, { slug: slug.value }),
   { watch: [slug] }
 )
+const relatedQuery = `*[_type == "project"] | order(order asc, date desc){
+  _id, title, date, role, roles,
+  "slug": slug.current,
+  "service": coalesce(services[0]->title, service->title),
+  "services": services[]->title,
+  mainImage,
+  thumbnail
+}`
+const { data: relatedData } = await useFreshSanityData('work-service-related-projects', async () => await fetchSanity(relatedQuery) || [])
 const fallbackProject = computed(() => placeholderProjects.find((item) => item.slug === slug.value))
 const currentProject = computed(() => project.value || fallbackProject.value)
+const currentService = computed(() => serviceForProject(currentProject.value))
+const serviceProjects = computed(() => relatedProjectsForService(
+  currentService.value,
+  (relatedData.value || placeholderProjects).map((item) => ({
+    ...item,
+    mainImageUrl: item.mainImageUrl || sanityImage(item.thumbnail) || sanityImage(item.mainImage)
+  })),
+  2,
+  slug.value
+))
 
 const mainImageUrl = computed(() => currentProject.value?.mainImageUrl || sanityImage(currentProject.value?.mainImage))
 const gallery = computed(() => currentProject.value?.galleryImageUrls || (currentProject.value?.galleryImages || []).map((image) => sanityImage(image)).filter(Boolean))
@@ -80,6 +99,12 @@ useSeo({
         <img :src="image" :alt="currentProject.title" loading="lazy" />
       </figure>
     </section>
+    <ServiceShowcase
+      v-if="currentService"
+      :service="currentService"
+      :projects="serviceProjects"
+      kicker="Related service"
+    />
   </article>
   <section v-else-if="pending" class="project-detail project-detail-intro" aria-live="polite" />
   <section v-else class="project-detail project-detail-intro">

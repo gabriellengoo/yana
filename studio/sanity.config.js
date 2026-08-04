@@ -1,6 +1,7 @@
 import { defineConfig } from 'sanity'
 import { structureTool } from 'sanity/structure'
 import { visionTool } from '@sanity/vision'
+import { media } from 'sanity-plugin-media'
 import { schemaTypes } from './schemas/index.js'
 
 const singleton = (S, type, title) =>
@@ -35,6 +36,7 @@ export default defineConfig({
             ].includes(item.getId()))
           ])
     }),
+    media(),
     visionTool()
   ],
   schema: {

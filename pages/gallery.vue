@@ -14,7 +14,7 @@ const query = `{
   }
 }`
 
-const { data } = await useAsyncData('gallery-entries', () => fetchSanity(query))
+const { data } = await useFreshSanityData('gallery-entries', () => fetchSanity(query))
 const page = computed(() => ({
   ...placeholderPages.gallery,
   ...(data.value?.page || {})

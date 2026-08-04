@@ -14,7 +14,7 @@ const query = `{
   }
 }`
 
-const { data } = await useAsyncData('work-projects', () => fetchSanity(query))
+const { data } = await useFreshSanityData('work-projects', async () => await fetchSanity(query) || { page: null, projects: [] })
 const projects = computed(() => {
   const publishedProjects = (data.value?.projects || []).map((project) => ({
     ...project,
@@ -37,7 +37,18 @@ useSeo({
 </script>
 
 <template>
-  <section class="work-carousel-page">
-    <ProjectList :projects="projects" carousel />
+  <section class="work-overview-page" aria-labelledby="work-title">
+    <h1 id="work-title" class="sr-only">{{ page.title || 'Work' }}</h1>
+    <div class="work-overview-grid">
+      <NuxtLink
+        v-for="project in projects"
+        :key="project._id || project.slug || project.title"
+        class="work-overview-item"
+        :to="project.slug ? `/work/${project.slug}` : '/work'"
+      >
+        <img :src="project.mainImageUrl" :alt="project.thumbnail?.alt || project.mainImage?.alt || project.title" loading="lazy" />
+        <span>{{ project.title }}</span>
+      </NuxtLink>
+    </div>
   </section>
 </template>

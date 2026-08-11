@@ -215,18 +215,19 @@ button:focus-visible, a:focus-visible {
 .menu-panel a,
 .menu-nested__toggle {
   width: fit-content;
-  font-size: clamp(52px, 6.2vw, 96px) !important;
+  font-size: clamp(26px, 3.1vw, 48px) !important;
   line-height: 1.12;
   font-weight: 400;
   letter-spacing: 0;
   text-transform: none;
+  text-align: center;
   color: #ffffff;
   opacity: 1;
   transition: opacity .25s var(--ease);
 }
 body .menu-panel.menu-panel a,
 body .menu-panel.menu-panel .menu-nested__toggle {
-  font-size: clamp(52px, 6.2vw, 96px) !important;
+  font-size: clamp(26px, 3.1vw, 48px) !important;
 }
 .menu-panel .router-link-active {
   color: #ffffff;

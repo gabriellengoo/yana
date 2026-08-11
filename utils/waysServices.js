@@ -16,7 +16,7 @@ export const waysServices = [
       'Delivery and post wrap up'
     ],
     deliverables: 'Light ongoing support for continuity, or production mode when a launch, shoot, collection drop or pop up needs heavier execution.',
-    relatedProjectTitles: ['ASICS x Office', 'Burberry']
+    relatedProjectTitles: ['Burberry']
   },
   {
     id: 'campaign-production',
@@ -39,7 +39,7 @@ export const waysServices = [
       'Wrap and follow-up'
     ],
     deliverables: 'Bring me in for launches, campaigns, shoot production periods and heavier planning. During quieter periods I can still jump on decks, casting or give remote nudges.',
-    relatedProjectTitles: ['Sharrkini', 'Matte Brand', 'NewWave - Designer Gaze', 'Designer Gaze']
+    relatedProjectTitles: ['Sharkkini X Puma', 'Matte Brand', 'NewWave - Designer Gaze', 'Designer Gaze']
   },
   {
     id: 'creative-operations',
@@ -61,7 +61,7 @@ export const waysServices = [
       'Wrap and follow-up'
     ],
     deliverables: 'Overall support across launches, campaigns, shoot production periods and heavier planning, with remote deck, casting and planning support when the work is quieter.',
-    relatedProjectTitles: ['ASICS x Office', 'Burberry', 'Holmes', 'B-Fixed The Exhibition']
+    relatedProjectTitles: ['Office x Asics', 'Burberry', 'Holmes', 'B-Fixed The Exhibition']
   },
   {
     id: 'creative-direction',
@@ -83,7 +83,7 @@ export const waysServices = [
       'Feedback during post-production where required'
     ],
     deliverables: 'Deliverables are tailored to each project but may include creative treatments, mood boards, visual references, shot lists and on-set creative direction.',
-    relatedProjectTitles: ['Lanei', 'Laneige x Say Now']
+    relatedProjectTitles: ['Laneige C Say Now', 'Designer Gaze']
   },
   {
     id: 'movement-direction-intimacy-coordination',
@@ -104,7 +104,7 @@ export const waysServices = [
       'On-set movement support'
     ],
     deliverables: 'Deliverables are tailored to each project but may include creative treatments, mood boards, visual references, shot lists and on-set movement direction or intimacy coordination.',
-    relatedProjectTitles: ['Fola X Ayra Starrr - Treat You Right', 'Designer Gaze', 'Laneige x Say Now']
+    relatedProjectTitles: ['FOLA X ARYA STARR', 'Designer Gaze', 'Laneige C Say Now']
   }
 ]
 
@@ -150,7 +150,7 @@ export const relatedProjectsForService = (service, projects = [], limit = 2, exc
         const compactItem = compactWantedTitles[index]
         return item && (title.includes(item) || item.includes(title) || compactTitle.includes(compactItem) || compactItem.includes(compactTitle))
       })
-      const serviceScore = serviceMatchesProject(service, project) ? 100 : 0
+      const serviceScore = wantedTitles.length ? 0 : (serviceMatchesProject(service, project) ? 100 : 0)
       const score = titleScore >= 0 ? 200 - titleScore : serviceScore
       return { project, score }
     })

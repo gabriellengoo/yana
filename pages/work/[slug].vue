@@ -19,7 +19,7 @@ const { data: project, pending } = await useFreshSanityData(
   { watch: [slug] }
 )
 const relatedQuery = `*[_type == "project"] | order(order asc, date desc){
-  _id, title, date, role, roles,
+  _id, title, date, year, role, roles, shortDescription,
   "slug": slug.current,
   "service": coalesce(services[0]->title, service->title),
   "services": services[]->title,
@@ -39,40 +39,84 @@ const serviceProjects = computed(() => relatedProjectsForService(
   2,
   slug.value
 ))
+const compactProjectTitle = (value = '') => String(value).toLowerCase().replace(/[^a-z0-9]+/g, '')
+const relatedProjectSubtext = (project) => [
+  project.shortDescription,
+  project.role || project.roles?.[0],
+  project.service || project.services?.[0],
+  project.year || project.date,
+  currentService.value?.title
+].filter(Boolean)[0] || ''
+const relatedProjectItems = computed(() => {
+  const service = currentService.value
+  const current = currentProject.value
+  if (!service || !current) return []
+
+  const actual = serviceProjects.value.map((project) => ({
+    title: project.title,
+    _relatedKey: project._id || project.slug || project.title,
+    _relatedHref: project.slug ? `/work/${project.slug}` : '',
+    _relatedSubtext: relatedProjectSubtext(project)
+  }))
+  const knownTitles = [
+    compactProjectTitle(current.title),
+    ...actual.map((item) => compactProjectTitle(item.title))
+  ].filter(Boolean)
+  const fallback = (service.relatedProjectTitles || [])
+    .filter((title) => {
+      const compactTitle = compactProjectTitle(title)
+      return compactTitle && !knownTitles.some((knownTitle) => knownTitle === compactTitle || knownTitle.includes(compactTitle) || compactTitle.includes(knownTitle))
+    })
+    .map((title) => ({
+      title,
+      _relatedKey: `related-${title}`,
+      _relatedHref: '',
+      _relatedSubtext: service.title
+    }))
+
+  return [...actual, ...fallback].slice(0, 2)
+})
 
 const mainImageUrl = computed(() => currentProject.value?.mainImageUrl || sanityImage(currentProject.value?.mainImage))
-const gallery = computed(() => currentProject.value?.galleryImageUrls || (currentProject.value?.galleryImages || []).map((image) => sanityImage(image)).filter(Boolean))
+const galleryMedia = computed(() => currentProject.value?.galleryImages?.length ? currentProject.value.galleryImages : currentProject.value?.galleryImageUrls || [])
 const placeholderProjectBlocks = [
   {
-    _key: 'placeholder-project-context',
-    blockType: 'textSection',
-    body: 'Placeholder paragraph for shaping project context, pacing and editorial rhythm. This space can hold background, process notes, production details or a short reflection on how the work came together.'
-  },
-  {
-    _key: 'placeholder-project-process',
-    blockType: 'textSection',
-    body: 'A second placeholder paragraph for testing longer project pages. Use this area to check how copy sits between image sections, paired media and full-page visual moments.'
+    _key: 'placeholder-project-media',
+    blockType: 'threeImageRow',
+    layoutStyle: 'laneThreeImageRow',
+    captionCounter: '1 / 3',
+    caption: 'Stills.',
+    images: placeholderProjects.slice(0, 3).map((item) => item.mainImageUrl).filter(Boolean)
   }
 ]
+const projectMediaCaption = computed(() => {
+  const project = currentProject.value
+  if (!project) return ''
+  return [
+    project.service || 'Stills',
+    project.role || project.roles?.[0] || ''
+  ].filter(Boolean).join('. ')
+})
 const projectContentBlocks = computed(() => {
   if (!currentProject.value) return []
-  return currentProject.value.contentBlocks?.length ? currentProject.value.contentBlocks : placeholderProjectBlocks
+  if (currentProject.value.contentBlocks?.length) return currentProject.value.contentBlocks
+  if (galleryMedia.value.length >= 3) {
+    return [{
+      _key: 'generated-project-three-image-row',
+      blockType: 'threeImageRow',
+      layoutStyle: 'laneThreeImageRow',
+      captionCounter: `1 / ${galleryMedia.value.length}`,
+      caption: projectMediaCaption.value,
+      images: galleryMedia.value.slice(0, 3)
+    }]
+  }
+  return placeholderProjectBlocks
 })
 const projectParagraph = computed(() => {
   const project = currentProject.value
   if (!project) return ''
 
-  const description = project.fullDescription || project.shortDescription || 'Placeholder project introduction for styling the opening paragraph, project details and image rhythm before final copy is published.'
-  const info = [
-    project.client ? `Client: ${project.client}` : '',
-    project.year || project.date ? `Date: ${project.year || project.date}` : '',
-    project.location ? `Location: ${project.location}` : '',
-    project.service ? `Service: ${project.service}` : '',
-    project.role ? `Role: ${project.role}` : '',
-    project.roles?.length ? `Contributions: ${project.roles.join(', ')}` : ''
-  ].filter(Boolean).join('. ')
-
-  return [description, info].filter(Boolean).join(' ')
+  return project.fullDescription || project.shortDescription || 'Placeholder project introduction for styling the opening paragraph, project details and image rhythm before final copy is published.'
 })
 useSeo({
   title: currentProject.value?.seoTitle || currentProject.value?.title || 'Project',
@@ -83,31 +127,37 @@ useSeo({
 </script>
 
 <template>
-  <article v-if="currentProject" class="project-detail">
-    <section class="project-detail-intro">
-      <p v-if="projectParagraph" class="project-detail-copy rich-text">{{ projectParagraph }}</p>
-    </section>
-    <figure v-if="mainImageUrl" class="project-full-bleed-image">
-      <img :src="mainImageUrl" :alt="currentProject.mainImage?.alt || currentProject.title" />
-    </figure>
-    <ProjectContentBlocks :blocks="projectContentBlocks" />
-    <section v-if="currentProject.videoUrl" class="project-video-block">
-      <iframe class="video-frame" :src="currentProject.videoUrl" :title="currentProject.title" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen />
-    </section>
-    <section v-if="gallery.length" class="detail-gallery">
-      <figure v-for="image in gallery" :key="image">
-        <img :src="image" :alt="currentProject.title" loading="lazy" />
+  <div class="project-detail-page">
+    <article v-if="currentProject" class="project-detail">
+      <section class="project-detail-intro">
+        <p v-if="projectParagraph" class="project-detail-copy rich-text">{{ projectParagraph }}</p>
+      </section>
+      <figure v-if="mainImageUrl" class="project-full-bleed-image">
+        <img :src="mainImageUrl" :alt="currentProject.mainImage?.alt || currentProject.title" />
       </figure>
+      <ProjectContentBlocks :blocks="projectContentBlocks" />
+      <section v-if="currentProject.videoUrl" class="project-video-block">
+        <iframe class="video-frame" :src="currentProject.videoUrl" :title="currentProject.title" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen />
+      </section>
+      <section v-if="relatedProjectItems.length" class="project-related-text" aria-label="Related projects">
+        <p class="project-related-text__intro">Projects related to this service:</p>
+        <div class="project-related-text__list">
+          <template v-for="item in relatedProjectItems" :key="item._relatedKey">
+            <NuxtLink v-if="item._relatedHref" class="project-related-text__item" :to="item._relatedHref">
+              <span class="project-related-text__title">{{ item.title }}</span>
+              <span v-if="item._relatedSubtext" class="project-related-text__subtext">{{ item._relatedSubtext }}</span>
+            </NuxtLink>
+            <article v-else class="project-related-text__item">
+              <span class="project-related-text__title">{{ item.title }}</span>
+              <span v-if="item._relatedSubtext" class="project-related-text__subtext">{{ item._relatedSubtext }}</span>
+            </article>
+          </template>
+        </div>
+      </section>
+    </article>
+    <section v-else-if="pending" class="project-detail project-detail-intro" aria-live="polite" />
+    <section v-else class="project-detail project-detail-intro">
+      <p class="project-detail-copy rich-text">Project not found.</p>
     </section>
-    <ServiceShowcase
-      v-if="currentService"
-      :service="currentService"
-      :projects="serviceProjects"
-      kicker="Related service"
-    />
-  </article>
-  <section v-else-if="pending" class="project-detail project-detail-intro" aria-live="polite" />
-  <section v-else class="project-detail project-detail-intro">
-    <p class="project-detail-copy rich-text">Project not found.</p>
-  </section>
+  </div>
 </template>

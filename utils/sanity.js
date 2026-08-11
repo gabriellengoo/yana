@@ -45,5 +45,7 @@ export const fetchSanity = async (query, params = {}) => {
 
 export const useFreshSanityData = (key, handler, options = {}) => useAsyncData(key, handler, {
   ...options,
-  getCachedData: () => null
+  getCachedData: (dataKey, nuxtApp) => nuxtApp.isHydrating
+    ? nuxtApp.payload.data[dataKey]
+    : null
 })

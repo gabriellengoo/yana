@@ -77,7 +77,8 @@ watch(() => route.fullPath, () => {
     </NuxtLink>
     <div class="menu-nested">
       <button class="menu-nested__toggle" type="button" :aria-expanded="waysOpen" @click="waysOpen = !waysOpen">
-        Ways To Work Better*
+        <span>Ways To Work Better*</span>
+        <span class="menu-nested__arrow" aria-hidden="true">→</span>
       </button>
       <div class="menu-nested__links" :class="{ 'is-open': waysOpen }">
         <NuxtLink

@@ -29,8 +29,30 @@ export default {
       },
       validation: (Rule) => Rule.required()
     },
+    {
+      name: 'layoutStyle',
+      title: 'Layout Style',
+      type: 'string',
+      description: 'Optional visual preset for mixing editorial project layouts.',
+      options: {
+        list: [
+          { title: 'Default', value: 'default' },
+          { title: 'Lane - wide media', value: 'laneWideMedia' },
+          { title: 'Lane - three image row', value: 'laneThreeImageRow' },
+          { title: 'Lane - single left media', value: 'laneSingleLeft' },
+          { title: 'Lane - two column media', value: 'laneTwoColumn' }
+        ]
+      },
+      initialValue: 'default'
+    },
     { name: 'heading', title: 'Heading', type: 'string' },
     { name: 'body', title: 'Body Text', type: 'text', rows: 6 },
+    {
+      name: 'captionCounter',
+      title: 'Caption Counter',
+      type: 'string',
+      description: 'Optional counter shown before the caption, for example: 1 / 3'
+    },
     { name: 'caption', title: 'Caption', type: 'text', rows: 2 },
     imageField('image', 'Image'),
     imageField('secondaryImage', 'Secondary Image'),

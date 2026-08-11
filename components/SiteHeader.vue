@@ -53,7 +53,7 @@ watch(() => route.fullPath, () => {
 </script>
 
 <template>
-  <header class="site-header">
+  <header class="site-header" :class="{ 'is-menu-open': open }">
     <button class="menu-toggle" type="button" :aria-expanded="open" aria-controls="primary-menu" @click="open = !open">
       <span class="menu-toggle__label">{{ open ? 'Close' : 'Menu' }}</span>
       <span class="menu-toggle__icon" aria-hidden="true">
@@ -78,7 +78,7 @@ watch(() => route.fullPath, () => {
     <div class="menu-nested">
       <button class="menu-nested__toggle" type="button" :aria-expanded="waysOpen" @click="waysOpen = !waysOpen">
         <span>Ways To Work Better*</span>
-        <span class="menu-nested__arrow" aria-hidden="true">→</span>
+        <span class="menu-nested__arrow" aria-hidden="true" />
       </button>
       <div class="menu-nested__links" :class="{ 'is-open': waysOpen }">
         <NuxtLink

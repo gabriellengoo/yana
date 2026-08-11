@@ -31,6 +31,18 @@ const posts = computed(() => {
 
   return publishedPosts.length ? publishedPosts : placeholderWorldPosts
 })
+const worldIntro = computed(() => page.value.introduction || 'World Building is the studio archive for references, essays and cultural notes. It gathers the thinking behind Yana Studios: the moods, systems and observations that shape the work.')
+const worldItems = computed(() => posts.value
+  .map((post) => ({
+    _id: post._id,
+    title: post.title,
+    subtitle: post.date || 'World note',
+    text: post.excerpt || 'A world-building note from the studio archive.',
+    imageUrl: post.imageUrl,
+    imageAlt: post.coverMedia?.alt || post.title,
+    href: post.externalNewsletterLink || ''
+  }))
+  .filter((item) => item.imageUrl))
 
 useSeo({
   title: page.value.seoTitle || page.value.title || 'World Building',
@@ -41,25 +53,42 @@ useSeo({
 </script>
 
 <template>
-  <section class="page-pad world-building-page">
-    <div class="page-heading">
+  <section class="powered-page world-building-page">
+    <header class="powered-hero">
       <h1>{{ page.title || 'World Building' }}</h1>
-      <p v-if="page.introduction">{{ page.introduction }}</p>
-    </div>
-    <div v-if="posts.length" class="initiative-grid">
-      <article v-for="post in posts" :key="post._id" class="initiative-card">
-        <a
-          class="initiative-thumb"
-          :href="post.externalNewsletterLink || '#'"
-          :target="post.externalNewsletterLink ? '_blank' : undefined"
-          :rel="post.externalNewsletterLink ? 'noreferrer' : undefined"
-        >
-          <img v-if="post.imageUrl" :src="post.imageUrl" :alt="post.coverMedia?.alt || post.title" loading="lazy" />
-        </a>
-        <div class="project-meta">
-          <div class="project-kicker">{{ post.date || 'Undated' }}</div>
-          <h2 class="project-title">{{ post.title }}</h2>
-          <p v-if="post.excerpt" class="project-description">{{ post.excerpt }}</p>
+      <p class="powered-intro rich-text">{{ worldIntro }}</p>
+    </header>
+
+    <div v-if="worldItems.length" class="powered-services">
+      <article v-for="(item, index) in worldItems" :key="item._id || item.title" class="powered-service" :class="{ 'powered-service--reverse': index % 2 === 1 }">
+        <div class="powered-service__copy">
+          <h2>{{ item.title }}</h2>
+          <p v-if="item.subtitle" class="powered-service__subtitle">{{ item.subtitle }}</p>
+          <p class="powered-service__body">{{ item.text }}</p>
+          <a
+            v-if="item.href"
+            class="powered-service__link"
+            :href="item.href"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Read more
+          </a>
+        </div>
+
+        <div class="powered-service__media">
+          <a
+            v-if="item.href"
+            class="powered-service__image"
+            :href="item.href"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <img :src="item.imageUrl" :alt="item.imageAlt" loading="lazy" />
+          </a>
+          <div v-else class="powered-service__image">
+            <img :src="item.imageUrl" :alt="item.imageAlt" loading="lazy" />
+          </div>
         </div>
       </article>
     </div>

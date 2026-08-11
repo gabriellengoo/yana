@@ -18,6 +18,28 @@ const projects = computed(() => (projectData.value || []).map((project) => ({
   mainImageUrl: sanityImage(project.thumbnail) || sanityImage(project.mainImage)
 })))
 const relatedProjects = computed(() => relatedProjectsForService(service.value, projects.value, 2))
+const serviceIndex = computed(() => {
+  const index = waysServices.findIndex((item) => item.id === service.value?.id)
+  return String(Math.max(index + 1, 1)).padStart(3, '0')
+})
+const displayServiceTitle = computed(() => service.value?.menuLabel || service.value?.title || '')
+const serviceImage = computed(() => {
+  const imageProjects = projects.value.filter((project) => project.mainImageUrl)
+  if (!imageProjects.length) {
+    const fallback = placeholderProjects.find((project) => project.mainImageUrl)
+    return fallback ? {
+      title: fallback.title,
+      src: fallback.mainImageUrl
+    } : null
+  }
+
+  const seed = String(route.params.slug || '').split('').reduce((total, letter) => total + letter.charCodeAt(0), 0)
+  const project = imageProjects[seed % imageProjects.length]
+  return {
+    title: project.title,
+    src: project.mainImageUrl
+  }
+})
 const compactProjectTitle = (value = '') => String(value).toLowerCase().replace(/[^a-z0-9]+/g, '')
 const projectSubtext = (project) => [
   project.shortDescription,
@@ -65,21 +87,29 @@ useSeo({
 <template>
   <article class="service-page">
     <section class="ways-detail">
-      <div class="ways-detail__heading">
-        <p>Ways To Work Better*</p>
-        <h1>{{ service.title }}</h1>
-        <p>{{ service.intro }}</p>
+      <div class="ways-detail__media">
+        <figure v-if="serviceImage" class="ways-detail__image">
+          <img :src="serviceImage.src" :alt="serviceImage.title" loading="lazy" />
+        </figure>
+        <div class="ways-detail__description">
+          <p>{{ service.intro }}</p>
+          <p>{{ service.deliverables }}</p>
+        </div>
       </div>
 
-      <div class="ways-detail__body">
-        <ul class="ways-detail__capabilities">
-          <li v-for="capability in service.capabilities" :key="capability">{{ capability }}</li>
-        </ul>
+      <div class="ways-detail__content">
+        <header class="ways-detail__meta">
+          <p>{{ serviceIndex }}</p>
+          <h1>{{ displayServiceTitle }}</h1>
+          <p>Yana Studios</p>
+        </header>
 
-        <div class="ways-detail__side">
-          <p>{{ service.deliverables }}</p>
+        <div class="ways-detail__credits">
+          <ul class="ways-detail__capabilities">
+            <li v-for="capability in service.capabilities" :key="capability">{{ capability }}</li>
+          </ul>
           <div v-if="relatedProjectItems.length" class="ways-detail__related">
-            <p>*projects related to this service:</p>
+            <h2>Related Projects</h2>
             <div class="ways-detail__related-list">
               <template v-for="project in relatedProjectItems" :key="project.key">
                 <NuxtLink v-if="project.href" class="ways-detail__related-link" :to="project.href">

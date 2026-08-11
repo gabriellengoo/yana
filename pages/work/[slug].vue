@@ -10,7 +10,8 @@ const query = `*[_type == "project" && slug.current == $slug][0]{
   "service": coalesce(services[0]->title, service->title),
   shortDescription, fullDescription, mainImage,
   galleryImages, videoUrl, seoTitle, seoDescription, socialImage,
-  contentBlocks
+  contentBlocks,
+  openingLayout
 }`
 
 const { data: project, pending } = await useFreshSanityData(
@@ -118,6 +119,35 @@ const projectParagraph = computed(() => {
 
   return project.fullDescription || project.shortDescription || 'Placeholder project introduction for styling the opening paragraph, project details and image rhythm before final copy is published.'
 })
+const layoutSeed = computed(() => slug.value.split('').reduce((total, letter) => total + letter.charCodeAt(0), 0))
+const openingLayout = computed(() => currentProject.value?.openingLayout || 'auto')
+const autoLayoutSections = computed(() => {
+  const variations = [
+    ['image', 'intro', 'blocks', 'video'],
+    ['intro', 'image', 'blocks', 'video'],
+    ['image', 'blocks', 'intro', 'video'],
+    ['blocks', 'image', 'intro', 'video']
+  ]
+
+  return variations[layoutSeed.value % variations.length]
+})
+const orderedProjectSections = computed(() => {
+  const fixed = {
+    imageFirst: ['image', 'intro', 'blocks', 'video'],
+    textFirst: ['intro', 'image', 'blocks', 'video'],
+    blocksFirst: ['blocks', 'image', 'intro', 'video'],
+    imageBlocksText: ['image', 'blocks', 'intro', 'video']
+  }
+  const order = fixed[openingLayout.value] || autoLayoutSections.value
+
+  return order.filter((section) => {
+    if (section === 'intro') return projectParagraph.value
+    if (section === 'image') return mainImageUrl.value
+    if (section === 'blocks') return projectContentBlocks.value.length
+    if (section === 'video') return currentProject.value?.videoUrl
+    return false
+  })
+})
 useSeo({
   title: currentProject.value?.seoTitle || currentProject.value?.title || 'Project',
   description: currentProject.value?.seoDescription || currentProject.value?.shortDescription || 'Project page for Yana Studios.',
@@ -129,16 +159,18 @@ useSeo({
 <template>
   <div class="project-detail-page">
     <article v-if="currentProject" class="project-detail">
-      <section class="project-detail-intro">
-        <p v-if="projectParagraph" class="project-detail-copy rich-text">{{ projectParagraph }}</p>
-      </section>
-      <figure v-if="mainImageUrl" class="project-full-bleed-image">
-        <img :src="mainImageUrl" :alt="currentProject.mainImage?.alt || currentProject.title" />
-      </figure>
-      <ProjectContentBlocks :blocks="projectContentBlocks" />
-      <section v-if="currentProject.videoUrl" class="project-video-block">
-        <iframe class="video-frame" :src="currentProject.videoUrl" :title="currentProject.title" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen />
-      </section>
+      <template v-for="section in orderedProjectSections" :key="section">
+        <section v-if="section === 'intro'" class="project-detail-intro">
+          <p class="project-detail-copy rich-text">{{ projectParagraph }}</p>
+        </section>
+        <figure v-else-if="section === 'image'" class="project-full-bleed-image">
+          <img :src="mainImageUrl" :alt="currentProject.mainImage?.alt || currentProject.title" />
+        </figure>
+        <ProjectContentBlocks v-else-if="section === 'blocks'" :blocks="projectContentBlocks" />
+        <section v-else-if="section === 'video'" class="project-video-block">
+          <iframe class="video-frame" :src="currentProject.videoUrl" :title="currentProject.title" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen />
+        </section>
+      </template>
       <section v-if="relatedProjectItems.length" class="project-related-text" aria-label="Related projects">
         <p class="project-related-text__intro">Projects related to this service:</p>
         <div class="project-related-text__list">

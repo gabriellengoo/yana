@@ -42,6 +42,26 @@ const query = `{
 const { data } = await useFreshSanityData('landing-content', () => fetchSanity(query))
 const settings = computed(() => data.value?.settings || {})
 const home = computed(() => data.value?.home || {})
+const normalizeProjectText = (value = '') => String(value).toLowerCase().replace(/[^a-z0-9]+/g, '')
+const priorityProjects = [
+  {
+    type: 'PRODUCTION',
+    match: ['burberryworldcup26', 'burberryworldcup', 'sharkkinixpuma']
+  },
+  {
+    type: 'CREATIVE DIRECTION',
+    match: ['laniegejuicepopad', 'laneigejuicepopad', 'juicepopad', 'juicepop', 'laneigecsaynow', 'laneigexsaynow']
+  },
+  {
+    type: 'MOVEMENT',
+    match: ['slowmotionvideoad', 'slowmotion', 'folaxaryastarr', 'joellemovement']
+  }
+]
+const projectPriority = (project) => {
+  const haystack = normalizeProjectText(`${project?.title || ''} ${project?.slug || ''}`)
+  const index = priorityProjects.findIndex((item) => item.match.some((term) => haystack.includes(term)))
+  return index === -1 ? 999 : index
+}
 const projects = computed(() => {
   const selectedProjects = (home.value.featuredProjects || []).filter(Boolean)
   const allProjects = (data.value?.allProjects || []).filter(Boolean)
@@ -52,10 +72,17 @@ const projects = computed(() => {
   ]
   const sourceProjects = publishedProjects.length ? publishedProjects : placeholderProjects
 
-  return sourceProjects.map((project) => ({
-    ...project,
-    mainImageUrl: project.mainImageUrl || sanityImage(project.thumbnail) || sanityImage(project.mainImage)
-  })).filter((project) => project.mainImageUrl)
+  return sourceProjects
+    .map((project, originalIndex) => ({
+      ...project,
+      originalIndex,
+      mainImageUrl: project.mainImageUrl || sanityImage(project.thumbnail) || sanityImage(project.mainImage)
+    }))
+    .filter((project) => project.mainImageUrl)
+    .sort((a, b) => {
+      const priorityDelta = projectPriority(a) - projectPriority(b)
+      return priorityDelta || a.originalIndex - b.originalIndex
+    })
 })
 const loopedProjects = computed(() => Array.from({ length: 12 }, () => projects.value).flat())
 const firstProjectImage = computed(() => projects.value[0]?.mainImageUrl)
@@ -107,6 +134,22 @@ const completeIntro = () => {
 }
 
 const homeProjectKey = (project, index) => `${project._id}-${index}`
+const homeProjectType = (project, index) => {
+  const priority = priorityProjects[projectPriority(project)]
+  const type = priority?.type || project.service || project.role || 'Project'
+  const count = projects.value.length || 1
+  return `${(index % count) + 1}. ${String(type).toUpperCase()}`
+}
+const homeProjectDescription = (project) => {
+  if (project.shortDescription) return project.shortDescription
+  const priority = priorityProjects[projectPriority(project)]
+  const fallback = {
+    PRODUCTION: 'Campaign production and launch support.',
+    'CREATIVE DIRECTION': 'Creative direction and visual world building.',
+    MOVEMENT: 'Movement direction and performance support.'
+  }
+  return fallback[priority?.type] || project.service || project.role || ''
+}
 const isDirectVideoUrl = (url = '') => /\.(mp4|webm|ogg|mov)(\?|#|$)/i.test(url) || /cdn\.sanity\.io\/files\//i.test(url)
 const youtubeId = (url = '') => {
   const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([^&?/#]+)/i)
@@ -141,7 +184,7 @@ useSeo({
 <template>
   <div class="home-page">
     <section v-if="showIntro" class="intro-page">
-      <IntroAnimation :settings="{ initialDelay: 700, totalDuration: 1800 }" @complete="completeIntro" />
+      <IntroAnimation :settings="{ initialDelay: 650, spellDelay: 1520, resolveDelay: 2920, totalDuration: 4300 }" @complete="completeIntro" />
     </section>
     <section class="home-statement home-statement--landing" :class="{ 'is-hidden': !showHomeStatement }">
       <p>Helping people and brands build emotional worlds and create cultural presence. Bringing ideas to life through production, creative operations and thoughtful execution.</p>
@@ -161,9 +204,9 @@ useSeo({
           <img v-else-if="project.mainImageUrl" :src="project.mainImageUrl" :alt="project.thumbnail?.alt || project.mainImage?.alt || project.title" loading="lazy" />
         </NuxtLink>
         <div class="home-work-caption">
-          <NuxtLink v-if="project.slug" :to="`/work/${project.slug}`">View</NuxtLink>
+          <NuxtLink v-if="project.slug" class="home-work-caption__type" :to="`/work/${project.slug}`">{{ homeProjectType(project, index) }}</NuxtLink>
           <span class="home-work-caption__text">
-            {{ project.title }}<template v-if="project.shortDescription"> - {{ project.shortDescription }}</template>
+            <span class="home-work-caption__title">{{ project.title }}</span><template v-if="homeProjectDescription(project)"> - {{ homeProjectDescription(project) }}</template>
           </span>
         </div>
       </article>

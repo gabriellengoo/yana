@@ -9,7 +9,7 @@ const query = `{
     seoDescription,
     socialImage,
     selectedProjects[]->{
-      _id, title, date, shortDescription, mainImage, thumbnail,
+      _id, title, date, shortDescription, role, roles, mainImage, thumbnail, galleryImages,
       "slug": slug.current,
       "service": coalesce(services[0]->title, service->title, role)
     }
@@ -19,7 +19,12 @@ const query = `{
     "slug": slug.current
   },
   "fallbackProjects": *[_type == "project" && isPoweredByYana == true] | order(order asc, date desc){
-    _id, title, date, shortDescription, mainImage, thumbnail,
+    _id, title, date, shortDescription, role, roles, mainImage, thumbnail, galleryImages,
+    "slug": slug.current,
+    "service": coalesce(services[0]->title, service->title, role)
+  },
+  "eventProjects": *[_type == "project"] | order(order asc, date desc){
+    _id, title, date, shortDescription, role, roles, mainImage, thumbnail, galleryImages,
     "slug": slug.current,
     "service": coalesce(services[0]->title, service->title, role)
   }
@@ -30,32 +35,82 @@ const page = computed(() => ({
   ...placeholderPages.poweredByYana,
   ...(data.value?.page || {})
 }))
-const poweredIntro = `PBY is our culturally observant in-house creative lab. A home for original ideas, experiences and cultural projects developed and produced by the studio. These are the concepts we create because we believe they deserve to exist.
+const poweredIntro = `Powered By Yana is the studio's home for cultural ideas, physical experiences and self-authored moments. We shape live projects, launches, exhibitions and community-facing worlds from concept through production.`
+const eventKeywords = [
+  'event',
+  'events',
+  'pop up',
+  'pop-up',
+  'launch',
+  'party',
+  'live',
+  'activation',
+  'exhibition',
+  'experience',
+  'experiential',
+  'mailer',
+  'gifting',
+  'community',
+  'installation',
+  'set design',
+  'powered by yana'
+]
+const isEventLikeProject = (project = {}) => {
+  const searchable = [
+    project.title,
+    project.shortDescription,
+    project.role,
+    ...(project.roles || []),
+    project.service
+  ].filter(Boolean).join(' ').toLowerCase()
 
-Exploring movement, fashion, image and cultural storytelling through creative production and strong visual direction.`
+  return eventKeywords.some((keyword) => searchable.includes(keyword))
+}
+const imageUrl = (image) => typeof image === 'string' ? image : sanityImage(image)
+const projectImages = (project = {}) => [
+  project.thumbnail,
+  project.mainImage,
+  ...(project.galleryImages || [])
+].map(imageUrl).filter(Boolean)
 const projects = computed(() => {
-  const publishedProjects = (page.value.selectedProjects?.length ? page.value.selectedProjects : data.value?.fallbackProjects || []).map((project) => ({
+  const selected = page.value.selectedProjects?.length ? page.value.selectedProjects : []
+  const powered = data.value?.fallbackProjects || []
+  const eventProjects = (data.value?.eventProjects || []).filter(isEventLikeProject)
+  const merged = [...selected, ...powered, ...eventProjects]
+  const seen = new Set()
+  const uniqueProjects = merged.filter((project) => {
+    const key = project._id || project.slug || project.title
+    if (!key || seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+
+  const publishedProjects = uniqueProjects.map((project) => ({
     ...project,
-    mainImageUrl: sanityImage(project.thumbnail) || sanityImage(project.mainImage)
+    imageUrls: projectImages(project),
+    mainImageUrl: projectImages(project)[0]
   }))
 
-  return publishedProjects.length ? publishedProjects : placeholderProjects
+  return publishedProjects.filter((project) => project.mainImageUrl)
 })
 const entries = computed(() => {
   const publishedEntries = (data.value?.entries || []).map((entry) => ({
     ...entry,
+    imageUrls: (entry.images || []).map(imageUrl).filter(Boolean),
     imageUrl: sanityImage(entry.images?.[0])
   })).filter((entry) => entry.imageUrl)
 
-  return publishedEntries.length ? publishedEntries : placeholderInitiatives
+  return publishedEntries
 })
 const poweredItems = computed(() => {
   if (entries.value.length) {
     return entries.value.map((entry) => ({
       _id: entry._id,
       title: entry.title,
-      text: entry.description || entry.date || entry.title,
+      subtitle: entry.date || 'Original experience',
+      text: entry.description || 'A Powered By Yana cultural project shaped through concept, planning and live production.',
       imageUrl: entry.imageUrl,
+      imageUrls: entry.imageUrls,
       imageAlt: entry.images?.[0]?.alt || entry.title,
       href: entry.externalLink
     }))
@@ -64,8 +119,10 @@ const poweredItems = computed(() => {
   return projects.value.map((project) => ({
     _id: project._id,
     title: project.title,
-    text: project.shortDescription || project.service || project.title,
+    subtitle: project.service || project.role || project.date || 'Live project',
+    text: project.shortDescription || 'A live, event-led or experience-led project produced through the studio.',
     imageUrl: project.mainImageUrl,
+    imageUrls: project.imageUrls,
     imageAlt: project.title,
     href: project.slug ? `/work/${project.slug}` : ''
   }))
@@ -80,20 +137,50 @@ useSeo({
 </script>
 
 <template>
-  <section class="page-pad powered-page">
-    <p class="powered-intro rich-text">{{ poweredIntro }}</p>
-    <div v-if="poweredItems.length" class="powered-list">
-      <article v-for="item in poweredItems" :key="item._id" class="powered-item">
-        <component
-          :is="item.href ? 'a' : 'div'"
-          class="powered-item__image"
-          :href="item.href || undefined"
-          :target="item.href?.startsWith('http') ? '_blank' : undefined"
-          :rel="item.href?.startsWith('http') ? 'noreferrer' : undefined"
-        >
-          <img v-if="item.imageUrl" :src="item.imageUrl" :alt="item.imageAlt" loading="lazy" />
-        </component>
-        <p class="powered-item__text">{{ item.text }}</p>
+  <section class="powered-page">
+    <header class="powered-hero">
+      <h1>Powered By Yana</h1>
+      <p class="powered-intro rich-text">{{ poweredIntro }}</p>
+    </header>
+
+    <div v-if="poweredItems.length" class="powered-services">
+      <article v-for="(item, index) in poweredItems" :key="item._id || item.title" class="powered-service" :class="{ 'powered-service--reverse': index % 2 === 1 }">
+        <div class="powered-service__copy">
+          <h2>{{ item.title }}</h2>
+          <p v-if="item.subtitle" class="powered-service__subtitle">{{ item.subtitle }}</p>
+          <p class="powered-service__body">{{ item.text }}</p>
+          <NuxtLink
+            v-if="item.href && !item.href.startsWith('http')"
+            class="powered-service__link"
+            :to="item.href"
+          >
+            View project
+          </NuxtLink>
+          <a
+            v-else-if="item.href"
+            class="powered-service__link"
+            :href="item.href"
+            target="_blank"
+            rel="noreferrer"
+          >
+            View project
+          </a>
+        </div>
+
+        <div class="powered-service__media">
+          <NuxtLink v-if="item.href && !item.href.startsWith('http')" class="powered-service__image" :to="item.href">
+            <img :src="item.imageUrl" :alt="item.imageAlt" loading="lazy" />
+          </NuxtLink>
+          <a v-else-if="item.href" class="powered-service__image" :href="item.href" target="_blank" rel="noreferrer">
+            <img :src="item.imageUrl" :alt="item.imageAlt" loading="lazy" />
+          </a>
+          <div v-else class="powered-service__image">
+            <img :src="item.imageUrl" :alt="item.imageAlt" loading="lazy" />
+          </div>
+          <div v-if="item.imageUrls?.length > 1" class="powered-service__thumbs" aria-hidden="true">
+            <img v-for="(src, imageIndex) in item.imageUrls.slice(0, 6)" :key="`${item._id || item.title}-${imageIndex}`" :src="src" alt="" loading="lazy" />
+          </div>
+        </div>
       </article>
     </div>
     <div v-else class="empty-state">Powered By Yana entries will appear here when published.</div>

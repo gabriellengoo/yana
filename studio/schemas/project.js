@@ -49,6 +49,23 @@ export default {
     { name: 'shortDescription', title: 'Short Description', type: 'text', rows: 3 },
     { name: 'fullDescription', title: 'Full Description', type: 'text', rows: 8 },
     {
+      name: 'openingLayout',
+      title: 'Opening Layout',
+      type: 'string',
+      description: 'Controls the order of the opening text, main image and modular blocks on the project page. Auto varies by project.',
+      options: {
+        list: [
+          { title: 'Auto / varied by project', value: 'auto' },
+          { title: 'Image first', value: 'imageFirst' },
+          { title: 'Text first', value: 'textFirst' },
+          { title: 'Content blocks first', value: 'blocksFirst' },
+          { title: 'Image, blocks, text', value: 'imageBlocksText' }
+        ],
+        layout: 'radio'
+      },
+      initialValue: 'auto'
+    },
+    {
       name: 'credits',
       title: 'Credits',
       type: 'array',

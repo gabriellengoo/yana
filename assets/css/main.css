@@ -215,7 +215,7 @@ button:focus-visible, a:focus-visible {
 .menu-panel a,
 .menu-nested__toggle {
   width: fit-content;
-  font-size: var(--site-font-size);
+  font-size: clamp(52px, 6.2vw, 96px) !important;
   line-height: 1.12;
   font-weight: 400;
   letter-spacing: 0;
@@ -1364,12 +1364,12 @@ body .work-overview-grid .work-overview-item:focus-within span {
   }
   .menu-panel a,
   .menu-nested__toggle {
-    font-size: clamp(58px, 16vw, 86px) !important;
+    font-size: clamp(52px, 6.2vw, 96px) !important;
     line-height: 1;
   }
   body .menu-panel.menu-panel a,
   body .menu-panel.menu-panel .menu-nested__toggle {
-    font-size: clamp(58px, 16vw, 86px) !important;
+    font-size: clamp(52px, 6.2vw, 96px) !important;
   }
   .menu-nested {
     gap: clamp(12px, 2.4vh, 24px);

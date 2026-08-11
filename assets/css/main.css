@@ -57,7 +57,7 @@ body {
   text-rendering: geometricPrecision;
 }
 
-body :not(.intro-page):not(.intro-page *) {
+body :not(.intro-page):not(.intro-page *):not(.menu-panel):not(.menu-panel *) {
   font-size: var(--site-font-size);
   font-weight: 400;
 }

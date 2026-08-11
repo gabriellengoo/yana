@@ -15,6 +15,19 @@ const query = `{
     coverMedia,
     externalNewsletterLink,
     "slug": slug.current
+  },
+  "projects": *[_type == "project"] | order(order asc, date desc){
+    _id,
+    title,
+    date,
+    year,
+    shortDescription,
+    role,
+    roles,
+    mainImage,
+    thumbnail,
+    "slug": slug.current,
+    "service": coalesce(services[0]->title, service->title, role)
   }
 }`
 
@@ -29,9 +42,17 @@ const posts = computed(() => {
     imageUrl: sanityImage(post.coverMedia)
   }))
 
-  return publishedPosts.length ? publishedPosts : placeholderWorldPosts
+  return publishedPosts
 })
 const worldIntro = computed(() => page.value.introduction || 'World Building is the studio archive for references, essays and cultural notes. It gathers the thinking behind Yana Studios: the moods, systems and observations that shape the work.')
+const projectImage = (project = {}) => sanityImage(project.thumbnail) || sanityImage(project.mainImage)
+const relatedProjects = computed(() => (data.value?.projects || [])
+  .map((project) => ({
+    ...project,
+    imageUrl: projectImage(project)
+  }))
+  .filter((project) => project.imageUrl && !/^test$/i.test(project.title || ''))
+  .slice(0, 3))
 const worldItems = computed(() => posts.value
   .map((post) => ({
     _id: post._id,
@@ -43,6 +64,16 @@ const worldItems = computed(() => posts.value
     href: post.externalNewsletterLink || ''
   }))
   .filter((item) => item.imageUrl))
+const relatedProjectItems = computed(() => relatedProjects.value.map((project) => ({
+  _id: project._id,
+  title: project.title,
+  subtitle: project.service || project.role || project.year || project.date || 'Related project',
+  text: project.shortDescription || `${project.title} sits within ${project.service || project.role || 'the studio archive'}, connecting the visual direction, production thinking and cultural context behind the work.`,
+  imageUrl: project.imageUrl,
+  imageAlt: project.thumbnail?.alt || project.mainImage?.alt || project.title,
+  href: project.slug ? `/work/${project.slug}` : ''
+})))
+const displayItems = computed(() => worldItems.value.length ? worldItems.value : relatedProjectItems.value)
 
 useSeo({
   title: page.value.seoTitle || page.value.title || 'World Building',
@@ -59,14 +90,21 @@ useSeo({
       <p class="powered-intro rich-text">{{ worldIntro }}</p>
     </header>
 
-    <div v-if="worldItems.length" class="powered-services">
-      <article v-for="(item, index) in worldItems" :key="item._id || item.title" class="powered-service" :class="{ 'powered-service--reverse': index % 2 === 1 }">
+    <div v-if="displayItems.length" class="powered-services">
+      <article v-for="(item, index) in displayItems" :key="item._id || item.title" class="powered-service" :class="{ 'powered-service--reverse': index % 2 === 1 }">
         <div class="powered-service__copy">
           <h2>{{ item.title }}</h2>
           <p v-if="item.subtitle" class="powered-service__subtitle">{{ item.subtitle }}</p>
           <p class="powered-service__body">{{ item.text }}</p>
+          <NuxtLink
+            v-if="item.href && !item.href.startsWith('http')"
+            class="powered-service__link"
+            :to="item.href"
+          >
+            Related project
+          </NuxtLink>
           <a
-            v-if="item.href"
+            v-else-if="item.href"
             class="powered-service__link"
             :href="item.href"
             target="_blank"
@@ -77,13 +115,14 @@ useSeo({
         </div>
 
         <div class="powered-service__media">
-          <a
-            v-if="item.href"
+          <NuxtLink
+            v-if="item.href && !item.href.startsWith('http')"
             class="powered-service__image"
-            :href="item.href"
-            target="_blank"
-            rel="noreferrer"
+            :to="item.href"
           >
+            <img :src="item.imageUrl" :alt="item.imageAlt" loading="lazy" />
+          </NuxtLink>
+          <a v-else-if="item.href" class="powered-service__image" :href="item.href" target="_blank" rel="noreferrer">
             <img :src="item.imageUrl" :alt="item.imageAlt" loading="lazy" />
           </a>
           <div v-else class="powered-service__image">

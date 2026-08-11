@@ -39,58 +39,27 @@ const baseNote = computed(() => page.value.contactDetails || 'Based in London, o
 const availabilityNote = computed(() => page.value.inviteInformation || 'Available for campaigns, shoots, launches, artist projects and live creative production.')
 const contactEmail = computed(() => page.value.contactEmail || 'hello@yanastudios.example')
 const extraSections = computed(() => page.value.sections || [])
+const infoParagraphs = computed(() => [
+  headline.value,
+  baseNote.value,
+  availabilityNote.value,
+  `Services: ${services.value.join(', ')}.`,
+  `Selected clients and collaborators: ${[...clients.value, ...(page.value.collaborators || [])].filter(Boolean).join(', ')}.`,
+  ...extraSections.value.map((section) => section.body).filter(Boolean)
+].filter(Boolean))
 
 useSeo({ title: page.value.title || 'Info', description: page.value.bio || 'Bio, contact, services, clients and collaborators for Yana Studios.', path: '/info' })
 </script>
 
 <template>
   <section class="info-page">
-    <div class="info-topline">
+    <div class="info-paragraphs">
+      <p v-for="paragraph in infoParagraphs" :key="paragraph" class="rich-text">{{ paragraph }}</p>
       <p>
-        Yana Studios<br />
-        London based<br />
-        Copyright 2026. All rights reserved.
+        <a :href="`mailto:${contactEmail}`">{{ contactEmail }}</a>
+        <template v-if="page.newsletterLink"> · <a :href="page.newsletterLink" target="_blank" rel="noreferrer">Newsletter</a></template>
+        · <a href="https://www.instagram.com/yana_studios" target="_blank" rel="noreferrer">Instagram</a>
       </p>
-      <div class="info-mark" aria-label="Yana Studios">YS</div>
-      <div class="info-lede">
-        <p>{{ headline }}</p>
-        <p>{{ baseNote }}</p>
-        <p>{{ availabilityNote }}</p>
-      </div>
-    </div>
-
-    <div class="info-directory">
-      <div class="info-column info-column--clients">
-        <h2>Selected Clients</h2>
-        <ul>
-          <li v-for="client in clients" :key="client">{{ client }}</li>
-        </ul>
-      </div>
-
-      <div class="info-column info-column--contact">
-        <h2>Contact Us</h2>
-        <a :href="`mailto:${contactEmail}`">→ E-mail</a>
-        <a v-if="page.newsletterLink" :href="page.newsletterLink" target="_blank" rel="noreferrer">→ Newsletter</a>
-      </div>
-
-      <div class="info-column info-column--social">
-        <h2>&nbsp;</h2>
-        <a href="https://www.instagram.com/yana_studios" target="_blank" rel="noreferrer">→ Follow us</a>
-      </div>
-
-      <div class="info-column info-column--services">
-        <h2>Services</h2>
-        <ul>
-          <li v-for="service in services" :key="service">{{ service }}</li>
-        </ul>
-      </div>
-    </div>
-
-    <div v-if="extraSections.length" class="info-notes">
-      <article v-for="section in extraSections" :key="section._key">
-        <h2 v-if="section.heading">{{ section.heading }}</h2>
-        <p v-if="section.body" class="rich-text">{{ section.body }}</p>
-      </article>
     </div>
 
     <h1 class="info-wordmark">Yana Studios</h1>

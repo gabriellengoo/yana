@@ -184,7 +184,7 @@ useSeo({
 <template>
   <div class="home-page">
     <section v-if="showIntro" class="intro-page">
-      <IntroAnimation :settings="{ initialDelay: 650, spellDelay: 1520, resolveDelay: 2920, totalDuration: 4300 }" @complete="completeIntro" />
+      <IntroAnimation :settings="{ initialDelay: 700, spellDelay: 1400, resolveDelay: 2300, totalDuration: 3100 }" @complete="completeIntro" />
     </section>
     <section class="home-statement home-statement--landing" :class="{ 'is-hidden': !showHomeStatement }">
       <p>Helping people and brands build emotional worlds and create cultural presence. Bringing ideas to life through production, creative operations and thoughtful execution.</p>

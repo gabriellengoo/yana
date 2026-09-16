@@ -1,3 +1,5 @@
+import { imageField } from './fields.js'
+
 export default {
   name: 'infoPage',
   title: 'Info Page',
@@ -5,6 +7,7 @@ export default {
   fields: [
     { name: 'title', title: 'Page Title', type: 'string', initialValue: 'Info' },
     { name: 'bio', title: 'About Copy', type: 'text', rows: 6 },
+    imageField('portraitImage', 'Portrait Image'),
     { name: 'contactEmail', title: 'Contact Email', type: 'email' },
     { name: 'contactDetails', title: 'Contact Details', type: 'text', rows: 4 },
     {

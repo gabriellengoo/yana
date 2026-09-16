@@ -2,7 +2,7 @@
 const props = defineProps({
   wordmark: {
     type: String,
-    default: 'Yana Studios'
+    default: 'Yana’s Studios'
   },
   links: {
     type: Array,
@@ -19,14 +19,21 @@ const waysServiceLinks = waysServices.map((service) => ({
   to: `/ways-to-work-better/${service.id}`
 }))
 
-const displayLabel = (label = '') => label
-  .toLowerCase()
-  .replace(/\b\w/g, (letter) => letter.toUpperCase())
-  .replace('Yana', 'Yana')
+const displayLabel = (label = '') => {
+  const normalized = normalLabel(label)
+  if (normalized === 'work') return 'Overview'
+  if (normalized.startsWith('waystowork')) return 'Ways To Work Better'
+
+  return label
+    .replace(/\*/g, '')
+    .toLowerCase()
+    .replace(/\b\w/g, (letter) => letter.toUpperCase())
+    .replace('Yana', 'Yana')
+}
 
 const isWaysLink = (link) => link?.label?.toLowerCase().replace(/\s+/g, '').startsWith('waystowork')
 
-const menuOrder = ['home', 'work', 'poweredbyyana', 'worldbuilding', 'info']
+const menuOrder = ['home', 'overview', 'work', 'poweredbyyana', 'worldbuilding', 'info']
 const normalLabel = (label = '') => label.toLowerCase().replace(/[^a-z0-9]+/g, '')
 const primaryLinks = computed(() => props.links
   .filter((link) => !isWaysLink(link))
@@ -36,8 +43,8 @@ const primaryLinks = computed(() => props.links
     const bIndex = menuOrder.indexOf(normalLabel(b.label))
     return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex)
   }))
-const beforeWaysLinks = computed(() => primaryLinks.value.filter((link) => ['home', 'work'].includes(normalLabel(link.label))))
-const afterWaysLinks = computed(() => primaryLinks.value.filter((link) => !['home', 'work'].includes(normalLabel(link.label))))
+const beforeWaysLinks = computed(() => primaryLinks.value.filter((link) => ['home', 'overview', 'work'].includes(normalLabel(link.label))))
+const afterWaysLinks = computed(() => primaryLinks.value.filter((link) => !['home', 'overview', 'work'].includes(normalLabel(link.label))))
 
 const goHome = async () => {
   open.value = false
@@ -74,10 +81,10 @@ watch(() => route.fullPath, () => {
         :rel="link.openInNewTab ? 'noreferrer' : undefined"
       >
         {{ displayLabel(link.label) }}
-    </NuxtLink>
+      </NuxtLink>
     <div class="menu-nested">
       <button class="menu-nested__toggle" type="button" :aria-expanded="waysOpen" @click="waysOpen = !waysOpen">
-        <span>Ways To Work Better*</span>
+        <span>Ways To Work Better</span>
         <span class="menu-nested__arrow" aria-hidden="true" />
       </button>
       <div class="menu-nested__links" :class="{ 'is-open': waysOpen }">
@@ -91,6 +98,10 @@ watch(() => route.fullPath, () => {
         >
           {{ displayLabel(link.label) }}
         </NuxtLink>
+        <button class="menu-nested__close" type="button" @click="waysOpen = false">
+          <span>Close Ways To Work Better</span>
+          <span aria-hidden="true">↑</span>
+        </button>
       </div>
     </div>
     <NuxtLink

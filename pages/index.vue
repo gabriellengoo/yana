@@ -83,54 +83,15 @@ const projects = computed(() => {
       const priorityDelta = projectPriority(a) - projectPriority(b)
       return priorityDelta || a.originalIndex - b.originalIndex
     })
+    .slice(0, 5)
 })
-const loopedProjects = computed(() => Array.from({ length: 12 }, () => projects.value).flat())
 const firstProjectImage = computed(() => projects.value[0]?.mainImageUrl)
 const nuxtApp = useNuxtApp()
 const introComplete = useState('home-intro-complete', () => import.meta.client && !nuxtApp.isHydrating)
 const showIntro = computed(() => !introComplete.value)
-const showHomeStatement = ref(true)
-let homeStatementTimer
-let homeAutoScrollTimer
-let homeAutoScrollIndex = 0
-
-const stopHomeAutoScroll = () => {
-  if (homeAutoScrollTimer) window.clearInterval(homeAutoScrollTimer)
-  homeAutoScrollTimer = null
-}
-
-const scrollToNextHomeProject = () => {
-  if (!import.meta.client) return
-  const items = Array.from(document.querySelectorAll('.home-work-item'))
-  if (!items.length) return
-
-  homeAutoScrollIndex = (homeAutoScrollIndex + 1) % items.length
-  items[homeAutoScrollIndex]?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-}
-
-const startHomeAutoScroll = () => {
-  if (!import.meta.client || homeAutoScrollTimer) return
-  window.setTimeout(() => {
-    const items = Array.from(document.querySelectorAll('.home-work-item'))
-    if (items.length && window.scrollY < items[0].offsetTop - 10) {
-      homeAutoScrollIndex = 0
-      items[0].scrollIntoView({ behavior: 'smooth', block: 'center' })
-    }
-  }, 450)
-  homeAutoScrollTimer = window.setInterval(scrollToNextHomeProject, 4200)
-}
-
-const scheduleHomeStatementHide = () => {
-  if (!import.meta.client || homeStatementTimer) return
-  homeStatementTimer = window.setTimeout(() => {
-    showHomeStatement.value = false
-    startHomeAutoScroll()
-  }, 3600)
-}
 
 const completeIntro = () => {
   introComplete.value = true
-  scheduleHomeStatementHide()
 }
 
 const homeProjectKey = (project, index) => `${project._id}-${index}`
@@ -164,15 +125,6 @@ const homeEmbedUrl = (url = '') => {
   return url
 }
 
-onMounted(() => {
-  if (!showIntro.value) scheduleHomeStatementHide()
-})
-
-onBeforeUnmount(() => {
-  if (homeStatementTimer) window.clearTimeout(homeStatementTimer)
-  stopHomeAutoScroll()
-})
-
 useSeo({
   title: home.value.seoTitle || settings.value.seoTitle || settings.value.title || 'Yana Studios',
   description: home.value.seoDescription || settings.value.seoDescription || settings.value.description || 'Recent work from Yana Studios.',
@@ -184,13 +136,16 @@ useSeo({
 <template>
   <div class="home-page">
     <section v-if="showIntro" class="intro-page">
-      <IntroAnimation :settings="{ initialDelay: 700, spellDelay: 1400, resolveDelay: 2300, totalDuration: 3100 }" @complete="completeIntro" />
+      <IntroAnimation :settings="{ initialDelay: 640, spellDelay: 1280, resolveDelay: 2080, totalDuration: 3300 }" @complete="completeIntro" />
     </section>
-    <section class="home-statement home-statement--landing" :class="{ 'is-hidden': !showHomeStatement }">
+    <section v-if="firstProjectImage" class="home-opening-image" aria-label="Opening image">
+      <img :src="firstProjectImage" alt="" />
+    </section>
+    <section class="home-statement home-statement--landing">
       <p>Helping people and brands build emotional worlds and create cultural presence. Bringing ideas to life through production, creative operations and thoughtful execution.</p>
     </section>
     <section class="home-work landing-work" aria-label="Recent work">
-      <article v-for="(project, index) in loopedProjects" :key="homeProjectKey(project, index)" class="home-work-item">
+      <article v-for="(project, index) in projects" :key="homeProjectKey(project, index)" class="home-work-item">
         <NuxtLink class="home-work-media" :to="project.slug ? `/work/${project.slug}` : '/work'">
           <video v-if="project.videoUrl && isDirectVideoUrl(project.videoUrl)" :src="project.videoUrl" muted loop playsinline autoplay />
           <iframe

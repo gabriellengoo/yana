@@ -1,7 +1,7 @@
 <script setup>
 const query = `*[_type == "infoPage"][0]{
   title, bio, contactEmail, contactDetails, services, clients, collaborators,
-  newsletterLink, inviteInformation, sections
+  newsletterLink, inviteInformation, portraitImage, sections
 }`
 
 const { data: info } = await useFreshSanityData('info-page', () => fetchSanity(query))
@@ -47,12 +47,17 @@ const infoParagraphs = computed(() => [
   `Selected clients and collaborators: ${[...clients.value, ...(page.value.collaborators || [])].filter(Boolean).join(', ')}.`,
   ...extraSections.value.map((section) => section.body).filter(Boolean)
 ].filter(Boolean))
+const portraitImage = computed(() => sanityImage(page.value.portraitImage))
 
 useSeo({ title: page.value.title || 'Info', description: page.value.bio || 'Bio, contact, services, clients and collaborators for Yana Studios.', path: '/info' })
 </script>
 
 <template>
   <section class="info-page">
+    <figure class="info-portrait">
+      <img v-if="portraitImage" :src="portraitImage" :alt="page.portraitImage?.alt || 'Portrait of Rhyana'" />
+      <span v-else aria-hidden="true">Image</span>
+    </figure>
     <div class="info-paragraphs">
       <p v-for="paragraph in infoParagraphs" :key="paragraph" class="rich-text">{{ paragraph }}</p>
       <p>
@@ -62,6 +67,6 @@ useSeo({ title: page.value.title || 'Info', description: page.value.bio || 'Bio,
       </p>
     </div>
 
-    <h1 class="info-wordmark">Yana Studios</h1>
+    <h1 class="info-wordmark">Yana’s Studios</h1>
   </section>
 </template>

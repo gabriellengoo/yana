@@ -19,8 +19,8 @@ export default {
       description: 'Add, remove and drag items to control the site menu order.',
       initialValue: [
         { label: 'HOME', linkType: 'internal', internalPath: '/', order: 1 },
-        { label: 'WORK', linkType: 'internal', internalPath: '/work', order: 2 },
-        { label: 'WAYS TO WORK BETTER*', linkType: 'internal', internalPath: '/ways-to-work-better', order: 3 },
+        { label: 'OVERVIEW', linkType: 'internal', internalPath: '/work', order: 2 },
+        { label: 'WAYS TO WORK BETTER', linkType: 'internal', internalPath: '/ways-to-work-better', order: 3 },
         { label: 'POWERED BY YANA', linkType: 'internal', internalPath: '/powered-by-yana', order: 4 },
         { label: 'WORLD BUILDING', linkType: 'internal', internalPath: '/world-building', order: 5 },
         { label: 'INFO', linkType: 'internal', internalPath: '/info', order: 6 }

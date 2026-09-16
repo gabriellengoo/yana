@@ -66,6 +66,14 @@ const isEventLikeProject = (project = {}) => {
 
   return eventKeywords.some((keyword) => searchable.includes(keyword))
 }
+const hiddenProjectTerms = ['test', 'bluebackground', 'cyberminimalism', 'mkeway', 'placeholder']
+const projectKey = (project = {}) => `${project.title || ''} ${project.slug || ''}`
+  .toLowerCase()
+  .replace(/[^a-z0-9]+/g, '')
+const isPublishedSiteProject = (project = {}) => {
+  const key = projectKey(project)
+  return key && !hiddenProjectTerms.some((term) => key.includes(term))
+}
 const imageUrl = (image) => typeof image === 'string' ? image : sanityImage(image)
 const projectImages = (project = {}) => [
   project.thumbnail,
@@ -75,8 +83,10 @@ const projectImages = (project = {}) => [
 const projects = computed(() => {
   const selected = page.value.selectedProjects?.length ? page.value.selectedProjects : []
   const powered = data.value?.fallbackProjects || []
-  const eventProjects = (data.value?.eventProjects || []).filter(isEventLikeProject)
-  const merged = [...selected, ...powered, ...eventProjects]
+  const allSiteProjects = (data.value?.eventProjects || []).filter(isPublishedSiteProject)
+  const eventProjects = allSiteProjects.filter(isEventLikeProject)
+  const fillerProjects = allSiteProjects.filter((project) => !isEventLikeProject(project))
+  const merged = [...selected, ...powered, ...eventProjects, ...fillerProjects]
   const seen = new Set()
   const uniqueProjects = merged.filter((project) => {
     const key = project._id || project.slug || project.title
@@ -91,7 +101,7 @@ const projects = computed(() => {
     mainImageUrl: projectImages(project)[0]
   }))
 
-  return publishedProjects.filter((project) => project.mainImageUrl)
+  return publishedProjects.filter((project) => project.mainImageUrl).slice(0, 5)
 })
 const entries = computed(() => {
   const publishedEntries = (data.value?.entries || []).map((entry) => ({
@@ -119,8 +129,8 @@ const poweredItems = computed(() => {
   return projects.value.map((project) => ({
     _id: project._id,
     title: project.title,
-    subtitle: project.service || project.role || project.date || 'Live project',
-    text: project.shortDescription || 'A live, event-led or experience-led project produced through the studio.',
+    subtitle: project.service || project.role || project.date || '',
+    text: project.shortDescription || '',
     imageUrl: project.mainImageUrl,
     imageUrls: project.imageUrls,
     imageAlt: project.title,
@@ -148,7 +158,7 @@ useSeo({
         <div class="powered-service__copy">
           <h2>{{ item.title }}</h2>
           <p v-if="item.subtitle" class="powered-service__subtitle">{{ item.subtitle }}</p>
-          <p class="powered-service__body">{{ item.text }}</p>
+          <p v-if="item.text" class="powered-service__body">{{ item.text }}</p>
           <NuxtLink
             v-if="item.href && !item.href.startsWith('http')"
             class="powered-service__link"

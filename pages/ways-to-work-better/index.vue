@@ -18,8 +18,8 @@ const projectsQuery = `*[_type == "project"] | order(order asc, date desc){
 }`
 const { data: projectData } = await useFreshSanityData('ways-to-work-better-projects', async () => await fetchSanity(projectsQuery) || [])
 const content = computed(() => Object.keys(page.value || {}).length ? page.value : {
-  title: 'Ways to Work Better*',
-  introduction: 'Placeholder service structure for styling anchor sections, navigation states and page spacing.'
+  title: 'Ways to Work Better',
+  introduction: ''
 })
 const services = waysServices
 const projects = computed(() => (projectData.value || []).map((project) => ({
@@ -39,7 +39,7 @@ useSeo({
 <template>
   <section class="page-pad ways-page">
     <div class="page-heading">
-      <h1>{{ content.title || 'Ways to Work Better*' }}</h1>
+      <h1>{{ String(content.title || 'Ways to Work Better').replace(/\*/g, '') }}</h1>
       <p v-if="content.introduction">{{ content.introduction }}</p>
     </div>
     <div class="service-anchor-list">

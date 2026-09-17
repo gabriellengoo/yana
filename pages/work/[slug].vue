@@ -17,7 +17,7 @@ const query = `*[_type == "project" && slug.current == $slug][0]{
 const { data: project, pending } = await useFreshSanityData(
   `project-${slug.value}`,
   () => fetchSanity(query, { slug: slug.value }),
-  { watch: [slug] }
+  { watch: [slug], lazy: true, default: () => null }
 )
 const relatedQuery = `*[_type == "project"] | order(order asc, date desc){
   _id, title, date, year, role, roles, shortDescription,
@@ -27,13 +27,16 @@ const relatedQuery = `*[_type == "project"] | order(order asc, date desc){
   mainImage,
   thumbnail
 }`
-const { data: relatedData } = await useFreshSanityData('work-service-related-projects', async () => await fetchSanity(relatedQuery) || [])
-const fallbackProject = computed(() => placeholderProjects.find((item) => item.slug === slug.value))
-const currentProject = computed(() => project.value || fallbackProject.value)
+const { data: relatedData } = await useFreshSanityData(
+  'work-service-related-projects',
+  async () => await fetchSanity(relatedQuery) || [],
+  { lazy: true, default: () => [] }
+)
+const currentProject = computed(() => project.value)
 const currentService = computed(() => serviceForProject(currentProject.value))
 const serviceProjects = computed(() => relatedProjectsForService(
   currentService.value,
-  (relatedData.value || placeholderProjects).map((item) => ({
+  (relatedData.value || []).map((item) => ({
     ...item,
     mainImageUrl: item.mainImageUrl || sanityImage(item.thumbnail) || sanityImage(item.mainImage)
   })),
@@ -80,16 +83,6 @@ const relatedProjectItems = computed(() => {
 
 const mainImageUrl = computed(() => currentProject.value?.mainImageUrl || sanityImage(currentProject.value?.mainImage))
 const galleryMedia = computed(() => currentProject.value?.galleryImages?.length ? currentProject.value.galleryImages : currentProject.value?.galleryImageUrls || [])
-const placeholderProjectBlocks = [
-  {
-    _key: 'placeholder-project-media',
-    blockType: 'threeImageRow',
-    layoutStyle: 'laneThreeImageRow',
-    captionCounter: '1 / 3',
-    caption: 'Stills.',
-    images: placeholderProjects.slice(0, 3).map((item) => item.mainImageUrl).filter(Boolean)
-  }
-]
 const projectMediaCaption = computed(() => {
   const project = currentProject.value
   if (!project) return ''
@@ -101,23 +94,33 @@ const projectMediaCaption = computed(() => {
 const projectContentBlocks = computed(() => {
   if (!currentProject.value) return []
   if (currentProject.value.contentBlocks?.length) return currentProject.value.contentBlocks
-  if (galleryMedia.value.length >= 3) {
+  if (galleryMedia.value.length >= 2) {
     return [{
-      _key: 'generated-project-three-image-row',
-      blockType: 'threeImageRow',
-      layoutStyle: 'laneThreeImageRow',
-      captionCounter: `1 / ${galleryMedia.value.length}`,
+      _key: 'generated-project-media-pair',
+      blockType: 'twoColumnMedia',
+      layoutStyle: 'laneTwoColumn',
+      captionCounter: `1 / 2`,
       caption: projectMediaCaption.value,
-      images: galleryMedia.value.slice(0, 3)
+      image: galleryMedia.value[0],
+      secondaryImage: galleryMedia.value[1]
     }]
   }
-  return placeholderProjectBlocks
+  if (galleryMedia.value.length === 1) {
+    return [{
+      _key: 'generated-project-single-image',
+      blockType: 'fullWidthImage',
+      layoutStyle: 'laneWideMedia',
+      caption: projectMediaCaption.value,
+      image: galleryMedia.value[0]
+    }]
+  }
+  return []
 })
 const projectParagraph = computed(() => {
   const project = currentProject.value
   if (!project) return ''
 
-  return project.fullDescription || project.shortDescription || 'Placeholder project introduction for styling the opening paragraph, project details and image rhythm before final copy is published.'
+  return project.fullDescription || project.shortDescription || ''
 })
 const layoutSeed = computed(() => slug.value.split('').reduce((total, letter) => total + letter.charCodeAt(0), 0))
 const openingLayout = computed(() => currentProject.value?.openingLayout || 'auto')
@@ -187,7 +190,9 @@ useSeo({
         </div>
       </section>
     </article>
-    <section v-else-if="pending" class="project-detail project-detail-intro" aria-live="polite" />
+    <section v-else-if="pending" class="project-detail project-detail-intro" aria-live="polite">
+      <p class="project-detail-copy">Loading project...</p>
+    </section>
     <section v-else class="project-detail project-detail-intro">
       <p class="project-detail-copy rich-text">Project not found.</p>
     </section>

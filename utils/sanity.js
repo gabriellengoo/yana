@@ -30,6 +30,18 @@ export const sanityImage = (source) => {
 }
 
 export const fetchSanity = async (query, params = {}) => {
+  if (import.meta.client) {
+    try {
+      return await $fetch('/api/sanity', {
+        method: 'POST',
+        body: { query, params }
+      })
+    } catch (error) {
+      console.warn('Sanity fetch failed:', error.message)
+      return null
+    }
+  }
+
   const sanityClient = getSanityClient()
   if (!sanityClient) return null
 

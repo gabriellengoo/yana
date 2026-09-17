@@ -10,7 +10,7 @@ const props = defineProps({
   },
   kicker: {
     type: String,
-    default: 'Ways to Work Better*'
+    default: 'Ways to Work Better'
   },
   excludeTitle: {
     type: String,
@@ -57,7 +57,7 @@ const projectSubtext = (project) => [
       <div class="service-showcase__side">
         <p>{{ service.deliverables }}</p>
         <div v-if="projects.length || fallbackProjectNames.length" class="service-showcase__related">
-          <p>*projects related to this service:</p>
+          <p>Projects related to this service:</p>
           <div class="service-projects">
             <NuxtLink
               v-for="project in linkedProjects"

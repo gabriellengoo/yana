@@ -33,7 +33,6 @@ const query = `{
 
 const { data } = await useFreshSanityData('world-building-page', () => fetchSanity(query))
 const page = computed(() => ({
-  ...placeholderPages.worldBuilding,
   ...(data.value?.page || {})
 }))
 const posts = computed(() => {
@@ -46,12 +45,17 @@ const posts = computed(() => {
 })
 const worldIntro = computed(() => page.value.introduction || 'World Building is the studio archive for references, essays and cultural notes. It gathers the thinking behind Yana Studios: the moods, systems and observations that shape the work.')
 const projectImage = (project = {}) => sanityImage(project.thumbnail) || sanityImage(project.mainImage)
+const hiddenProjectTerms = ['test', 'bluebackground', 'cyberminimalism', 'mkeway', 'placeholder']
+const isPublishedSiteProject = (project = {}) => {
+  const key = `${project.title || ''} ${project.slug || ''}`.toLowerCase().replace(/[^a-z0-9]+/g, '')
+  return key && !hiddenProjectTerms.some((term) => key.includes(term))
+}
 const relatedProjects = computed(() => (data.value?.projects || [])
   .map((project) => ({
     ...project,
     imageUrl: projectImage(project)
   }))
-  .filter((project) => project.imageUrl && !/^test$/i.test(project.title || ''))
+  .filter((project) => project.imageUrl && isPublishedSiteProject(project))
   .slice(0, 3))
 const worldItems = computed(() => posts.value
   .map((post) => ({
@@ -86,7 +90,7 @@ useSeo({
 <template>
   <section class="powered-page world-building-page">
     <header class="powered-hero">
-      <h1>{{ page.title || 'World Building' }}</h1>
+      <h1 class="sr-only">{{ page.title || 'World Building' }}</h1>
       <p class="powered-intro rich-text">{{ worldIntro }}</p>
     </header>
 

@@ -70,9 +70,7 @@ const projects = computed(() => {
     ...selectedProjects,
     ...allProjects.filter((project) => !selectedIds.has(project._id))
   ]
-  const sourceProjects = publishedProjects.length ? publishedProjects : placeholderProjects
-
-  return sourceProjects
+  return publishedProjects
     .map((project, originalIndex) => ({
       ...project,
       originalIndex,

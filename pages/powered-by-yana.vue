@@ -32,7 +32,6 @@ const query = `{
 
 const { data } = await useFreshSanityData('powered-by-yana', () => fetchSanity(query))
 const page = computed(() => ({
-  ...placeholderPages.poweredByYana,
   ...(data.value?.page || {})
 }))
 const poweredIntro = `Powered By Yana is the studio's home for cultural ideas, physical experiences and self-authored moments. We shape live projects, launches, exhibitions and community-facing worlds from concept through production.`
@@ -149,7 +148,7 @@ useSeo({
 <template>
   <section class="powered-page">
     <header class="powered-hero">
-      <h1>Powered By Yana</h1>
+      <h1 class="sr-only">Powered By Yana</h1>
       <p class="powered-intro rich-text">{{ poweredIntro }}</p>
     </header>
 

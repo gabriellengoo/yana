@@ -25,13 +25,7 @@ const serviceIndex = computed(() => {
 const displayServiceTitle = computed(() => service.value?.menuLabel || service.value?.title || '')
 const serviceImage = computed(() => {
   const imageProjects = projects.value.filter((project) => project.mainImageUrl)
-  if (!imageProjects.length) {
-    const fallback = placeholderProjects.find((project) => project.mainImageUrl)
-    return fallback ? {
-      title: fallback.title,
-      src: fallback.mainImageUrl
-    } : null
-  }
+  if (!imageProjects.length) return null
 
   const seed = String(route.params.slug || '').split('').reduce((total, letter) => total + letter.charCodeAt(0), 0)
   const project = imageProjects[seed % imageProjects.length]

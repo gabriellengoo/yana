@@ -34,15 +34,15 @@ const projects = computed(() => {
     imageOrientation: imageOrientation(project.thumbnailDimensions || project.mainImageDimensions)
   })).filter((project) => project.mainImageUrl)
 
-  return publishedProjects.length ? publishedProjects : placeholderProjects
+  return publishedProjects
 })
 const imageOrientation = (dimensions = {}) => {
   if (!dimensions?.width || !dimensions?.height) return 'portrait'
   return dimensions.width > dimensions.height ? 'landscape' : 'portrait'
 }
 const page = computed(() => data.value?.page || {
-  title: 'Work',
-  introduction: 'Placeholder archive entries for styling project list states.'
+  title: 'Overview',
+  introduction: ''
 })
 
 useSeo({
@@ -68,5 +68,6 @@ useSeo({
         <span>{{ project.title }}</span>
       </NuxtLink>
     </div>
+    <p v-if="!projects.length" class="empty-state">Projects will appear here when published.</p>
   </section>
 </template>

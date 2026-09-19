@@ -6,11 +6,18 @@ defineProps({
   }
 })
 
-const imageUrl = (image) => sanityImage(image)
+const imageUrl = (image) => typeof image === 'string' ? image : sanityImage(image)
 const linkTarget = (link) => {
   if (!link) return ''
   return link.linkType === 'external' ? link.externalUrl : link.internalPath
 }
+const blockClasses = (block) => [
+  `content-block--${block.blockType}`,
+  block.layoutStyle && block.layoutStyle !== 'default' ? `content-block--layout-${block.layoutStyle}` : ''
+]
+const captionCount = (block, total = 0) => block.captionCounter || (block.caption && total > 1 ? `1 / ${total}` : '')
+const captionText = (block) => block.caption || ''
+const hasCaption = (block, total = 0) => captionCount(block, total) || captionText(block)
 </script>
 
 <template>
@@ -19,7 +26,7 @@ const linkTarget = (link) => {
       v-for="(block, index) in blocks"
       :key="block._key || `${block.blockType}-${index}`"
       class="content-block"
-      :class="`content-block--${block.blockType}`"
+      :class="blockClasses(block)"
     >
       <template v-if="block.blockType === 'textSection'">
         <div class="content-text">
@@ -55,6 +62,10 @@ const linkTarget = (link) => {
           allow="autoplay; fullscreen; picture-in-picture"
           allowfullscreen
         />
+        <div v-if="hasCaption(block)" class="content-block-caption">
+          <span v-if="captionCount(block)" class="content-block-caption__count">{{ captionCount(block) }}</span>
+          <span v-if="captionText(block)" class="content-block-caption__text">{{ captionText(block) }}</span>
+        </div>
       </template>
 
       <template v-else-if="block.blockType === 'twoColumnMedia' || block.blockType === 'portraitLandscapePairing'">
@@ -66,13 +77,21 @@ const linkTarget = (link) => {
             <img :src="imageUrl(block.secondaryImage)" :alt="block.secondaryImage?.alt || block.heading || ''" loading="lazy" />
           </figure>
         </div>
+        <div v-if="hasCaption(block, 2)" class="content-block-caption">
+          <span v-if="captionCount(block, 2)" class="content-block-caption__count">{{ captionCount(block, 2) }}</span>
+          <span v-if="captionText(block)" class="content-block-caption__text">{{ captionText(block) }}</span>
+        </div>
       </template>
 
       <template v-else-if="block.blockType === 'threeImageRow' || block.blockType === 'imageGallery'">
         <div class="block-gallery" :class="{ 'block-gallery--three': block.blockType === 'threeImageRow' }">
-          <figure v-for="image in block.images || []" :key="image._key">
+          <figure v-for="(image, imageIndex) in block.images || []" :key="image._key || `${block._key || index}-image-${imageIndex}`">
             <img v-if="imageUrl(image)" :src="imageUrl(image)" :alt="image.alt || block.heading || ''" loading="lazy" />
           </figure>
+        </div>
+        <div v-if="hasCaption(block, block.images?.length || 0)" class="content-block-caption">
+          <span v-if="captionCount(block, block.images?.length || 0)" class="content-block-caption__count">{{ captionCount(block, block.images?.length || 0) }}</span>
+          <span v-if="captionText(block)" class="content-block-caption__text">{{ captionText(block) }}</span>
         </div>
       </template>
 
@@ -92,6 +111,10 @@ const linkTarget = (link) => {
         <figure v-if="imageUrl(block.image)" class="content-image">
           <img :src="imageUrl(block.image)" :alt="block.image?.alt || block.heading || ''" loading="lazy" />
         </figure>
+        <div v-if="imageUrl(block.image) && hasCaption(block, 1)" class="content-block-caption">
+          <span v-if="captionCount(block, 1)" class="content-block-caption__count">{{ captionCount(block, 1) }}</span>
+          <span v-if="captionText(block)" class="content-block-caption__text">{{ captionText(block) }}</span>
+        </div>
         <div v-if="block.heading || block.body" class="content-text">
           <h2 v-if="block.heading">{{ block.heading }}</h2>
           <p v-if="block.body" class="rich-text">{{ block.body }}</p>

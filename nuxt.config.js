@@ -2,11 +2,36 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   css: ['~/assets/css/main.css'],
   modules: ['@nuxtjs/sitemap'],
+  watchers: {
+    chokidar: {
+      ignored: [
+        '**/.git/**',
+        '**/.nuxt/**',
+        '**/.output/**',
+        '**/dist/**',
+        '**/node_modules/**',
+        'studio/**'
+      ]
+    }
+  },
+  vite: {
+    server: {
+      watch: {
+        ignored: [
+          '**/.git/**',
+          '**/.nuxt/**',
+          '**/.output/**',
+          '**/dist/**',
+          '**/node_modules/**',
+          'studio/**'
+        ]
+      }
+    }
+  },
   experimental: {
     appManifest: false
   },
   app: {
-    pageTransition: { name: 'page', mode: 'out-in' },
     head: {
       htmlAttrs: { lang: 'en' },
       meta: [
@@ -28,7 +53,7 @@ export default defineNuxtConfig({
   },
   site: {
     url: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
-    name: 'Yana Studios'
+    name: 'Yana’s Studios'
   },
   future: {
     compatibilityVersion: 3

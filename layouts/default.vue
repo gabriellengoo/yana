@@ -1,8 +1,8 @@
 <script setup>
 const defaultLinks = [
   { label: 'HOME', to: '/' },
-  { label: 'WORK', to: '/work' },
-  { label: 'WAYS TO WORK BETTER*', to: '/ways-to-work-better' },
+  { label: 'OVERVIEW', to: '/work' },
+  { label: 'WAYS TO WORK BETTER', to: '/ways-to-work-better' },
   { label: 'POWERED BY YANA', to: '/powered-by-yana' },
   { label: 'WORLD BUILDING', to: '/world-building' },
   { label: 'INFO', to: '/info' }
@@ -50,7 +50,11 @@ const links = computed(() => {
 const brandStyle = computed(() => ({
   '--color-brand': settings.value.primaryBrandColour || '#002366'
 }))
-const wordmark = computed(() => settings.value.wordmark === '.YANA' ? 'Yana Studios' : settings.value.wordmark || 'Yana Studios')
+const wordmark = computed(() => {
+  const value = settings.value.wordmark
+  if (!value || value === '.YANA' || value === 'Yana Studios') return 'Yana’s Studios'
+  return value.replace(/^Yana Studios$/i, 'Yana’s Studios')
+})
 </script>
 
 <template>

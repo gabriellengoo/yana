@@ -5,12 +5,12 @@ export default {
   title: 'Site Settings',
   type: 'document',
   fields: [
-    { name: 'title', title: 'Site Title', type: 'string', initialValue: 'Yana Studios' },
+    { name: 'title', title: 'Site Title', type: 'string', initialValue: 'Yana’s Studios' },
     {
       name: 'wordmark',
       title: 'Header Wordmark',
       type: 'string',
-      initialValue: 'Yana Studios',
+      initialValue: 'Yana’s Studios',
       description: 'The text logo shown in the fixed header.'
     },
     {
@@ -66,7 +66,7 @@ export default {
       name: 'openingAnimation',
       title: 'Opening Animation Settings',
       type: 'object',
-      description: 'Controls the approved RHYANAS STU to YANA STUDIOS opening sequence.',
+      description: 'Controls the approved Rhyana’s Stu to Yana’s Studios opening sequence.',
       fields: [
         {
           name: 'enabled',
@@ -80,7 +80,7 @@ export default {
           type: 'array',
           of: [{ type: 'string' }],
           description: 'Reference text for editors. The coded animation uses the approved drop and reveal sequence.',
-          initialValue: ['RHYANAS STU', 'YANA STU', 'YANA STUDIOS']
+          initialValue: ['Rhyana’s Stu', 'Yana’s Stu', 'Yana’s Studios']
         },
         {
           name: 'initialDelay',

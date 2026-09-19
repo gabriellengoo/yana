@@ -14,11 +14,11 @@ const query = `{
   }
 }`
 
-const { data } = await useAsyncData('home-content', () => fetchSanity(query))
+const { data } = await useFreshSanityData('home-content', () => fetchSanity(query))
 const settings = computed(() => data.value?.settings || {})
 const home = computed(() => data.value?.home || {
-  title: 'Yana Studios',
-  introduction: 'Placeholder statement copy for styling the homepage while final content is being prepared.'
+  title: 'Yana’s Studios',
+  introduction: ''
 })
 const heroImage = computed(() => sanityImage(home.value.heroImage) || sanityImage(settings.value.heroImage))
 const pageTitle = computed(() => home.value.title || settings.value.title || 'Yana Studios')

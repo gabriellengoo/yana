@@ -7,8 +7,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['complete'])
-const phase = ref(0)
-const removableLetters = 6
+const stage = ref(0)
 
 onMounted(() => {
   if (props.settings?.enabled === false) {
@@ -16,15 +15,14 @@ onMounted(() => {
     return
   }
 
-  const initialDelay = props.settings?.initialDelay ?? 700
-  const stepDuration = props.settings?.stepDuration ?? 150
-  const totalDuration = props.settings?.totalDuration ?? 2100
+  const initialDelay = props.settings?.initialDelay ?? 640
+  const spellDelay = props.settings?.spellDelay ?? 1280
+  const resolveDelay = props.settings?.resolveDelay ?? 2080
+  const totalDuration = props.settings?.totalDuration ?? 3300
 
-  Array.from({ length: removableLetters }).forEach((_, index) => {
-    window.setTimeout(() => {
-      phase.value = index + 1
-    }, initialDelay + index * stepDuration)
-  })
+  window.setTimeout(() => { stage.value = 1 }, initialDelay)
+  window.setTimeout(() => { stage.value = 2 }, spellDelay)
+  window.setTimeout(() => { stage.value = 3 }, resolveDelay)
   window.setTimeout(() => {
     emit('complete')
   }, totalDuration)
@@ -33,11 +31,12 @@ onMounted(() => {
 
 <template>
   <div class="intro-lockup">
-    <div class="intro-word" :class="`intro-word--phase-${phase}`" aria-live="polite" aria-label="Yana Studios">
-      <span class="intro-mark">
-        <span class="intro-core">
-          <span class="intro-remove intro-remove--1">R</span><span class="intro-remove intro-remove--2">H</span><span>YANA</span><span class="intro-remove intro-remove--3">S</span><span class="intro-remove intro-remove--4">&nbsp;S</span><span class="intro-remove intro-remove--5">T</span><span class="intro-remove intro-remove--6">U</span>
-        </span>
+    <div class="intro-word" :class="`intro-word--stage-${stage}`" aria-live="polite" aria-label="Rhyana’s Stu to Yana’s Studios">
+      <span class="intro-layer intro-layer--start" aria-hidden="true">
+        <span class="intro-piece intro-piece--rh">Rh</span><span>yana’s Stu</span>
+      </span>
+      <span class="intro-layer intro-layer--final" aria-hidden="true">
+        <span>Yana’s Stu</span><span class="intro-piece intro-piece--dios">dios</span>
       </span>
     </div>
   </div>

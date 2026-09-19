@@ -1,6 +1,6 @@
 export const useSeo = (meta = {}) => {
   const config = useRuntimeConfig()
-  const title = meta.title ? `${meta.title} | Yana Studios` : 'Yana Studios | Rhyana'
+  const title = meta.title ? `${meta.title} | Yana’s Studios` : 'Yana’s Studios | Rhyana'
   const description = meta.description || 'A minimal archive for creative direction, production, movement direction and cultural projects by Rhyana.'
   const image = meta.image || ''
 

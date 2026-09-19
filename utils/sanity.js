@@ -15,7 +15,7 @@ export const getSanityClient = () => {
       projectId,
       dataset: config.public.sanityDataset,
       apiVersion: config.public.sanityApiVersion,
-      useCdn: true
+      useCdn: false
     })
   }
 
@@ -30,13 +30,34 @@ export const sanityImage = (source) => {
 }
 
 export const fetchSanity = async (query, params = {}) => {
+  if (import.meta.client) {
+    try {
+      return await $fetch('/api/sanity', {
+        method: 'POST',
+        body: { query, params }
+      })
+    } catch (error) {
+      console.warn('Sanity fetch failed:', error.message)
+      return null
+    }
+  }
+
   const sanityClient = getSanityClient()
   if (!sanityClient) return null
 
   try {
-    return await sanityClient.fetch(query, params)
+    return await sanityClient.fetch(query, params, {
+      cache: 'no-store'
+    })
   } catch (error) {
     console.warn('Sanity fetch failed:', error.message)
     return null
   }
 }
+
+export const useFreshSanityData = (key, handler, options = {}) => useAsyncData(key, handler, {
+  ...options,
+  getCachedData: (dataKey, nuxtApp) => nuxtApp.isHydrating
+    ? nuxtApp.payload.data[dataKey]
+    : null
+})

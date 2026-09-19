@@ -15,12 +15,24 @@ const query = `{
     coverMedia,
     externalNewsletterLink,
     "slug": slug.current
+  },
+  "projects": *[_type == "project"] | order(order asc, date desc){
+    _id,
+    title,
+    date,
+    year,
+    shortDescription,
+    role,
+    roles,
+    mainImage,
+    thumbnail,
+    "slug": slug.current,
+    "service": coalesce(services[0]->title, service->title, role)
   }
 }`
 
-const { data } = await useAsyncData('world-building-page', () => fetchSanity(query))
+const { data } = await useFreshSanityData('world-building-page', () => fetchSanity(query))
 const page = computed(() => ({
-  ...placeholderPages.worldBuilding,
   ...(data.value?.page || {})
 }))
 const posts = computed(() => {
@@ -29,8 +41,43 @@ const posts = computed(() => {
     imageUrl: sanityImage(post.coverMedia)
   }))
 
-  return publishedPosts.length ? publishedPosts : placeholderWorldPosts
+  return publishedPosts
 })
+const worldIntro = computed(() => page.value.introduction || 'World Building is the studio archive for references, essays and cultural notes. It gathers the thinking behind Yana Studios: the moods, systems and observations that shape the work.')
+const projectImage = (project = {}) => sanityImage(project.thumbnail) || sanityImage(project.mainImage)
+const hiddenProjectTerms = ['test', 'bluebackground', 'cyberminimalism', 'mkeway', 'placeholder']
+const isPublishedSiteProject = (project = {}) => {
+  const key = `${project.title || ''} ${project.slug || ''}`.toLowerCase().replace(/[^a-z0-9]+/g, '')
+  return key && !hiddenProjectTerms.some((term) => key.includes(term))
+}
+const relatedProjects = computed(() => (data.value?.projects || [])
+  .map((project) => ({
+    ...project,
+    imageUrl: projectImage(project)
+  }))
+  .filter((project) => project.imageUrl && isPublishedSiteProject(project))
+  .slice(0, 3))
+const worldItems = computed(() => posts.value
+  .map((post) => ({
+    _id: post._id,
+    title: post.title,
+    subtitle: post.date || 'World note',
+    text: post.excerpt || 'A world-building note from the studio archive.',
+    imageUrl: post.imageUrl,
+    imageAlt: post.coverMedia?.alt || post.title,
+    href: post.externalNewsletterLink || ''
+  }))
+  .filter((item) => item.imageUrl))
+const relatedProjectItems = computed(() => relatedProjects.value.map((project) => ({
+  _id: project._id,
+  title: project.title,
+  subtitle: project.service || project.role || project.year || project.date || 'Related project',
+  text: project.shortDescription || `${project.title} sits within ${project.service || project.role || 'the studio archive'}, connecting the visual direction, production thinking and cultural context behind the work.`,
+  imageUrl: project.imageUrl,
+  imageAlt: project.thumbnail?.alt || project.mainImage?.alt || project.title,
+  href: project.slug ? `/work/${project.slug}` : ''
+})))
+const displayItems = computed(() => worldItems.value.length ? worldItems.value : relatedProjectItems.value)
 
 useSeo({
   title: page.value.seoTitle || page.value.title || 'World Building',
@@ -41,25 +88,50 @@ useSeo({
 </script>
 
 <template>
-  <section class="page-pad world-building-page">
-    <div class="page-heading">
-      <h1>{{ page.title || 'World Building' }}</h1>
-      <p v-if="page.introduction">{{ page.introduction }}</p>
-    </div>
-    <div v-if="posts.length" class="initiative-grid">
-      <article v-for="post in posts" :key="post._id" class="initiative-card">
-        <a
-          class="initiative-thumb"
-          :href="post.externalNewsletterLink || '#'"
-          :target="post.externalNewsletterLink ? '_blank' : undefined"
-          :rel="post.externalNewsletterLink ? 'noreferrer' : undefined"
-        >
-          <img v-if="post.imageUrl" :src="post.imageUrl" :alt="post.coverMedia?.alt || post.title" loading="lazy" />
-        </a>
-        <div class="project-meta">
-          <div class="project-kicker">{{ post.date || 'Undated' }}</div>
-          <h2 class="project-title">{{ post.title }}</h2>
-          <p v-if="post.excerpt" class="project-description">{{ post.excerpt }}</p>
+  <section class="powered-page world-building-page">
+    <header class="powered-hero">
+      <h1 class="sr-only">{{ page.title || 'World Building' }}</h1>
+      <p class="powered-intro rich-text">{{ worldIntro }}</p>
+    </header>
+
+    <div v-if="displayItems.length" class="powered-services">
+      <article v-for="(item, index) in displayItems" :key="item._id || item.title" class="powered-service" :class="{ 'powered-service--reverse': index % 2 === 1 }">
+        <div class="powered-service__copy">
+          <h2>{{ item.title }}</h2>
+          <p v-if="item.subtitle" class="powered-service__subtitle">{{ item.subtitle }}</p>
+          <p class="powered-service__body">{{ item.text }}</p>
+          <NuxtLink
+            v-if="item.href && !item.href.startsWith('http')"
+            class="powered-service__link"
+            :to="item.href"
+          >
+            Related project
+          </NuxtLink>
+          <a
+            v-else-if="item.href"
+            class="powered-service__link"
+            :href="item.href"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Read more
+          </a>
+        </div>
+
+        <div class="powered-service__media">
+          <NuxtLink
+            v-if="item.href && !item.href.startsWith('http')"
+            class="powered-service__image"
+            :to="item.href"
+          >
+            <img :src="item.imageUrl" :alt="item.imageAlt" loading="lazy" />
+          </NuxtLink>
+          <a v-else-if="item.href" class="powered-service__image" :href="item.href" target="_blank" rel="noreferrer">
+            <img :src="item.imageUrl" :alt="item.imageAlt" loading="lazy" />
+          </a>
+          <div v-else class="powered-service__image">
+            <img :src="item.imageUrl" :alt="item.imageAlt" loading="lazy" />
+          </div>
         </div>
       </article>
     </div>

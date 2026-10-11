@@ -34,7 +34,14 @@ const { data } = await useFreshSanityData('powered-by-yana', () => fetchSanity(q
 const page = computed(() => ({
   ...(data.value?.page || {})
 }))
-const poweredIntro = `Powered By Yana is the studio's home for cultural ideas, physical experiences and self-authored moments. We shape live projects, launches, exhibitions and community-facing worlds from concept through production.`
+const poweredIntro = computed(() => page.value.introduction || 'PBY is our culturally observant in-house creative lab. A home for original ideas, experiences and cultural projects developed and produced by the studio. These are the concepts we create simply because we believe they deserve to exist.')
+const expectedPoweredProjects = [
+  'Find Your Tribe: One Year Strong',
+  'BFIXEDIT: The Exhibition',
+  'Off The Record',
+  'Fish Tank Shoot',
+  'Cyber Minimalism'
+]
 const eventKeywords = [
   'event',
   'events',
@@ -65,7 +72,7 @@ const isEventLikeProject = (project = {}) => {
 
   return eventKeywords.some((keyword) => searchable.includes(keyword))
 }
-const hiddenProjectTerms = ['test', 'bluebackground', 'cyberminimalism', 'mkeway', 'placeholder']
+const hiddenProjectTerms = ['test', 'bluebackground', 'mkeway', 'placeholder']
 const projectKey = (project = {}) => `${project.title || ''} ${project.slug || ''}`
   .toLowerCase()
   .replace(/[^a-z0-9]+/g, '')
@@ -193,5 +200,11 @@ useSeo({
       </article>
     </div>
     <div v-else class="empty-state">Powered By Yana entries will appear here when published.</div>
+    <section class="content-note" aria-label="Expected Powered By Yana projects">
+      <p>Expected projects for this section:</p>
+      <ul>
+        <li v-for="project in expectedPoweredProjects" :key="project">{{ project }}</li>
+      </ul>
+    </section>
   </section>
 </template>

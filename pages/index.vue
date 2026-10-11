@@ -84,6 +84,7 @@ const projects = computed(() => {
     .slice(0, 5)
 })
 const firstProjectImage = computed(() => projects.value[0]?.mainImageUrl)
+const homeHeroImage = '/images/yana-home-hero-placeholder.jpeg'
 const nuxtApp = useNuxtApp()
 const introComplete = useState('home-intro-complete', () => import.meta.client && !nuxtApp.isHydrating)
 const showIntro = computed(() => !introComplete.value)
@@ -126,7 +127,7 @@ const homeEmbedUrl = (url = '') => {
 useSeo({
   title: home.value.seoTitle || settings.value.seoTitle || settings.value.title || 'Yana Studios',
   description: home.value.seoDescription || settings.value.seoDescription || settings.value.description || 'Recent work from Yana Studios.',
-  image: sanityImage(home.value.socialImage) || sanityImage(settings.value.socialImage) || firstProjectImage.value,
+  image: sanityImage(home.value.socialImage) || sanityImage(settings.value.socialImage) || homeHeroImage || firstProjectImage.value,
   path: '/'
 })
 </script>
@@ -134,13 +135,14 @@ useSeo({
 <template>
   <div class="home-page">
     <section v-if="showIntro" class="intro-page">
+      <img class="intro-page__image" src="/images/yana-opening-placeholder.jpeg" alt="" />
       <IntroAnimation :settings="{ initialDelay: 640, spellDelay: 1280, resolveDelay: 2080, totalDuration: 3300 }" @complete="completeIntro" />
     </section>
-    <section v-if="firstProjectImage" class="home-opening-image" aria-label="Opening image">
-      <img :src="firstProjectImage" alt="" />
-    </section>
-    <section class="home-statement home-statement--landing">
-      <p>Helping people and brands build emotional worlds and create cultural presence. Bringing ideas to life through production, creative operations and thoughtful execution.</p>
+    <section class="home-opening-image" aria-label="Home hero image">
+      <img :src="homeHeroImage" alt="" />
+      <div class="home-opening-copy">
+        <p>Helping people and brands build emotional worlds and create cultural presence. Bringing ideas to life through production, creative operations and thoughtful execution.</p>
+      </div>
     </section>
     <section class="home-work landing-work" aria-label="Recent work">
       <article v-for="(project, index) in projects" :key="homeProjectKey(project, index)" class="home-work-item">

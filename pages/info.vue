@@ -34,10 +34,10 @@ const defaultServices = [
 ]
 const clients = computed(() => page.value.clients?.length ? page.value.clients : defaultClients)
 const services = computed(() => page.value.services?.length ? page.value.services : defaultServices)
-const headline = computed(() => page.value.bio || 'Production, casting, creative direction, movement direction, intimacy coordination and creative operations.')
-const baseNote = computed(() => page.value.contactDetails || 'Based in London, operating worldwide.')
-const availabilityNote = computed(() => page.value.inviteInformation || 'Available for campaigns, shoots, launches, artist projects and live creative production.')
-const contactEmail = computed(() => page.value.contactEmail || 'hello@yanastudios.example')
+const headline = computed(() => page.value.bio || 'Rhyana Hollingsworth is a London based Creative Producer and Director working across art, fashion and culture. Her practice centres on bringing creative ideas to life through production, thoughtful execution and creative operations, helping brands and people build emotional worlds and create cultural presence.')
+const baseNote = computed(() => page.value.contactDetails || 'Based in London, available worldwide.')
+const availabilityNote = computed(() => page.value.inviteInformation || 'Available for launches, campaigns, productions, creative operations, events and collaborations.')
+const contactEmail = computed(() => page.value.contactEmail || 'Hello@yanastudios.pr')
 const extraSections = computed(() => page.value.sections || [])
 const infoParagraphs = computed(() => [
   headline.value,

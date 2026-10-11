@@ -21,11 +21,11 @@ export const placeholderPages = {
   },
   worldBuilding: {
     title: 'World Building',
-    introduction: 'Notes, essays and field observations around culture, feeling and creative infrastructure.'
+    introduction: 'Every project begins long before posting. This is where ideas are explored, creative processes are documented, and observations on culture, storytelling and production come to life.'
   },
   poweredByYana: {
     title: 'Powered By Yana',
-    introduction: 'Original initiatives, collaborations and self-authored cultural projects.',
+    introduction: 'PBY is our culturally observant in-house creative lab. A home for original ideas, experiences and cultural projects developed and produced by the studio. These are the concepts we create simply because we believe they deserve to exist.',
     sections: [
       {
         _key: 'placeholder-origin',
@@ -49,14 +49,14 @@ export const placeholderPages = {
   },
   info: {
     title: 'Info',
-    bio: 'Yana Studios is a creative production and world-building practice shaping cultural projects, campaigns and live moments.',
-    contactEmail: 'hello@yanastudios.example',
-    contactDetails: 'London / available for selected projects, residencies and collaborations.',
-    services: ['Embedded Producer', 'Campaign Production', 'Creative Operations', 'Creative Direction', 'Movement Direction / Intimacy Coordination'],
-    clients: ['Client Name One', 'Client Name Two', 'Client Name Three'],
-    collaborators: ['Artist Name', 'Director Name', 'Studio Partner'],
+    bio: 'Rhyana Hollingsworth is a London based Creative Producer and Director working across art, fashion and culture. Her practice centres on bringing creative ideas to life through production, thoughtful execution and creative operations, helping brands and people build emotional worlds and create cultural presence.',
+    contactEmail: 'Hello@yanastudios.pr',
+    contactDetails: 'Based in London, available worldwide.',
+    services: ['Movement Direction / Intimacy Coordination', 'Campaign Production', 'Creative Ops', 'Embedded Producer', 'Creative Direction'],
+    clients: ['Fola', 'Arya Starr', 'Laneige', 'ASICS', 'Office', 'Burberry', 'Designer Gaze', 'Sharkkini', 'Puma', 'Matte Brand', 'Holmes', 'B-fixed'],
+    collaborators: [],
     newsletterLink: '#',
-    inviteInformation: 'Placeholder invite copy for styling this section before final content is published.',
+    inviteInformation: 'Available for launches, campaigns, productions, creative operations, events and collaborations.',
     sections: [
       {
         _key: 'placeholder-approach',

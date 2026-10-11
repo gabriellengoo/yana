@@ -43,9 +43,9 @@ const posts = computed(() => {
 
   return publishedPosts
 })
-const worldIntro = computed(() => page.value.introduction || 'World Building is the studio archive for references, essays and cultural notes. It gathers the thinking behind Yana Studios: the moods, systems and observations that shape the work.')
+const worldIntro = computed(() => page.value.introduction || 'Every project begins long before posting. This is where ideas are explored, creative processes are documented, and observations on culture, storytelling and production come to life.')
 const projectImage = (project = {}) => sanityImage(project.thumbnail) || sanityImage(project.mainImage)
-const hiddenProjectTerms = ['test', 'bluebackground', 'cyberminimalism', 'mkeway', 'placeholder']
+const hiddenProjectTerms = ['test', 'bluebackground', 'mkeway', 'placeholder']
 const isPublishedSiteProject = (project = {}) => {
   const key = `${project.title || ''} ${project.slug || ''}`.toLowerCase().replace(/[^a-z0-9]+/g, '')
   return key && !hiddenProjectTerms.some((term) => key.includes(term))
@@ -136,5 +136,12 @@ useSeo({
       </article>
     </div>
     <div v-else class="empty-state">World Building posts will appear here when published in Sanity.</div>
+    <section class="content-note" aria-label="Expected World Building content">
+      <p>Expected content:</p>
+      <ul>
+        <li>Moodboards</li>
+        <li>Freeforms</li>
+      </ul>
+    </section>
   </section>
 </template>

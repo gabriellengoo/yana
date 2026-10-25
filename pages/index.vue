@@ -136,7 +136,7 @@ useSeo({
   <div class="home-page">
     <section v-if="showIntro" class="intro-page">
       <img class="intro-page__image" src="/images/yana-opening-placeholder.jpeg" alt="" />
-      <IntroAnimation :settings="{ initialDelay: 640, spellDelay: 1280, resolveDelay: 2080, totalDuration: 3300 }" @complete="completeIntro" />
+      <IntroAnimation :settings="{ totalDuration: 3300 }" @complete="completeIntro" />
     </section>
     <section class="home-opening-image" aria-label="Home hero image">
       <img :src="homeHeroImage" alt="" />

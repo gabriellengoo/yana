@@ -106,21 +106,21 @@ button:focus-visible, a:focus-visible {
   justify-content: space-between;
   align-items: center;
   padding: 9px 12px;
-  color: #ffffff;
-  background: var(--color-brand);
+  color: var(--color-brand);
+  background: #ffffff;
   border-bottom: 0;
   transition: background .25s var(--ease), color .25s var(--ease);
 }
 .site-header.is-menu-open {
-  color: #ffffff;
-  background: var(--color-brand);
+  color: var(--color-brand);
+  background: #ffffff;
 }
 .site-logo {
   display: block;
   grid-column: 2;
   grid-row: 1;
   justify-self: end;
-  color: #ffffff;
+  color: var(--color-brand);
   font-size: var(--site-font-size);
   line-height: 1;
   font-weight: 400;
@@ -129,7 +129,7 @@ button:focus-visible, a:focus-visible {
   transition: color .25s var(--ease);
 }
 .site-header.is-menu-open .site-logo {
-  color: #ffffff;
+  color: var(--color-brand);
 }
 .menu-toggle {
   display: inline-flex;
@@ -327,7 +327,7 @@ body .menu-panel.menu-panel .menu-nested__close * {
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   object-position: center;
   opacity: .92;
 }
@@ -353,42 +353,6 @@ body .menu-panel.menu-panel .menu-nested__close * {
   font-weight: 400;
   letter-spacing: 0;
   text-transform: none;
-  text-shadow: 0 0 20px rgba(0, 0, 0, .28), 0 0 42px rgba(0, 0, 0, .22);
-}
-.intro-layer {
-  grid-area: 1 / 1;
-  display: block;
-  white-space: nowrap;
-}
-.intro-layer--start,
-.intro-layer--final {
-  display: inline-flex;
-  align-items: baseline;
-  justify-content: center;
-}
-.intro-piece {
-  display: inline-block;
-}
-.intro-piece--rh {
-  transition: transform .72s var(--ease);
-}
-.intro-piece--dios {
-  transform: translateX(1.6em);
-  transition: transform .72s var(--ease);
-}
-.intro-word--stage-1 .intro-piece--rh,
-.intro-word--stage-2 .intro-piece--rh,
-.intro-word--stage-3 .intro-piece--rh {
-  transform: translateY(1.2em);
-}
-.intro-word--stage-0 .intro-layer--final,
-.intro-word--stage-1 .intro-layer--final,
-.intro-word--stage-2 .intro-layer--start,
-.intro-word--stage-3 .intro-layer--start {
-  display: none;
-}
-.intro-word--stage-3 .intro-piece--dios {
-  transform: translateX(0);
 }
 .home-opening-image {
   position: relative;
@@ -417,9 +381,9 @@ body .menu-panel.menu-panel .menu-nested__close * {
 .home-opening-copy p {
   width: min(720px, 82vw);
   margin: 0;
-  color: var(--color-title);
+  color: var(--color-brand);
   line-height: 1.2;
-  text-shadow: 0 0 18px rgba(255, 255, 255, .9), 0 0 36px rgba(255, 255, 255, .74);
+  text-transform: uppercase;
 }
 .home-statement {
   min-height: auto;
@@ -1285,18 +1249,6 @@ body .info-page .info-wordmark.info-wordmark {
 .service-page {
   background: var(--color-background);
 }
-body:has(.service-page) .site-header,
-body:has(.service-page) .site-logo {
-  color: #ffffff;
-}
-body:has(.intro-page) .site-header {
-  background: var(--color-brand);
-  border-bottom-color: transparent;
-}
-body:has(.intro-page) .site-header,
-body:has(.intro-page) .site-logo {
-  color: #ffffff;
-}
 .service-showcase {
   min-height: 100vh;
   padding: clamp(72px, 9vh, 110px) var(--gutter) clamp(34px, 6vh, 76px);
@@ -1514,11 +1466,41 @@ body .work-overview-grid .work-overview-item:focus-within span {
   .home-statement p {
     line-height: .95;
   }
+  .home-opening-image {
+    height: 100vh;
+    height: 100svh;
+    min-height: 0;
+    padding: 0;
+  }
+  .home-opening-image img {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    object-fit: cover;
+  }
+  .home-work-item {
+    min-height: 0;
+    padding: 0;
+    gap: 0;
+  }
   .home-work-media {
-    width: min(100%, 680px);
+    width: 100%;
+    min-width: 0;
+    height: 100vh;
+    height: 100svh;
+    overflow: hidden;
+  }
+  .home-work-media img,
+  .home-work-media video,
+  .home-work-media iframe {
+    height: 100%;
+    max-height: none;
+    object-fit: cover;
   }
   .home-work-caption {
-    width: min(100%, 680px);
+    width: 100%;
+    margin: 0;
+    padding: 24px var(--gutter) 36px;
   }
   .powered-page {
     padding: clamp(68px, 11vh, 96px) 18px clamp(62px, 10vh, 96px);

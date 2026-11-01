@@ -195,8 +195,8 @@ button:focus-visible, a:focus-visible {
   height: 100vh;
   height: 100dvh;
   padding: clamp(76px, 11vh, 120px) 18px clamp(44px, 8vh, 88px);
-  color: #ffffff;
-  background: var(--color-brand);
+  color: var(--color-brand);
+  background: #ffffff;
   border-bottom: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -224,7 +224,7 @@ button:focus-visible, a:focus-visible {
   letter-spacing: 0;
   text-transform: none;
   text-align: center;
-  color: #ffffff;
+  color: var(--color-brand);
   opacity: 1;
   transition: opacity .25s var(--ease);
 }
@@ -233,7 +233,7 @@ body .menu-panel.menu-panel .menu-nested__toggle {
   font-size: clamp(21px, 2.35vw, 36px) !important;
 }
 .menu-panel .router-link-active {
-  color: #ffffff;
+  color: var(--color-brand);
   opacity: 1;
 }
 .menu-panel a:hover,
@@ -242,7 +242,7 @@ body .menu-panel.menu-panel .menu-nested__toggle {
 .menu-nested__toggle:focus-visible,
 .menu-panel .router-link-active:hover,
 .menu-panel .router-link-active:focus-visible {
-  color: #ffffff;
+  color: var(--color-brand);
   opacity: .45;
 }
 .menu-nested {
@@ -252,7 +252,7 @@ body .menu-panel.menu-panel .menu-nested__toggle {
   min-width: 0;
   width: min(520px, 100%);
   padding-bottom: clamp(12px, 2vh, 24px);
-  border-bottom: 1px solid rgba(255, 255, 255, .45);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-brand) 45%, transparent);
 }
 .menu-nested__toggle {
   display: inline-flex;
@@ -299,8 +299,8 @@ body .menu-panel.menu-panel .menu-nested__toggle {
   width: fit-content;
   margin-top: clamp(8px, 1.4vh, 16px);
   padding-top: clamp(10px, 1.6vh, 18px);
-  color: #ffffff;
-  border-top: 1px solid rgba(255, 255, 255, .45);
+  color: var(--color-brand);
+  border-top: 1px solid color-mix(in srgb, var(--color-brand) 45%, transparent);
   opacity: .72;
 }
 body .menu-panel.menu-panel .menu-nested__close,
@@ -322,6 +322,18 @@ body .menu-panel.menu-panel .menu-nested__close * {
   color: #fff;
   overflow: hidden;
 }
+.intro-fade-leave-active {
+  transition: opacity .6s ease-out;
+  pointer-events: none;
+}
+.intro-fade-leave-to {
+  opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .intro-fade-leave-active {
+    transition-duration: .01ms;
+  }
+}
 .intro-page__image {
   position: absolute;
   inset: 0;
@@ -332,11 +344,9 @@ body .menu-panel.menu-panel .menu-nested__close * {
   opacity: .92;
 }
 .intro-lockup {
-  position: relative;
+  position: absolute;
+  inset: 0;
   z-index: 1;
-  width: 100%;
-  min-height: 100vh;
-  min-height: 100dvh;
   display: grid;
   align-items: center;
   justify-items: center;

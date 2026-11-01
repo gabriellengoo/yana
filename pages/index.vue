@@ -134,10 +134,12 @@ useSeo({
 
 <template>
   <div class="home-page">
-    <section v-if="showIntro" class="intro-page">
-      <img class="intro-page__image" src="/images/yana-opening-placeholder.jpeg" alt="" />
-      <IntroAnimation :settings="{ totalDuration: 3300 }" @complete="completeIntro" />
-    </section>
+    <Transition name="intro-fade">
+      <section v-if="showIntro" class="intro-page">
+        <img class="intro-page__image" src="/images/yana-opening-placeholder.jpeg" alt="" />
+        <IntroAnimation :settings="{ totalDuration: 3300 }" @complete="completeIntro" />
+      </section>
+    </Transition>
     <section class="home-opening-image" aria-label="Home hero image">
       <img :src="homeHeroImage" alt="" />
       <div class="home-opening-copy">

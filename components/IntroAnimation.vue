@@ -27,6 +27,6 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="intro-lockup">
-    <div class="intro-word">yana</div>
+    <div class="intro-word">yana.</div>
   </div>
 </template>

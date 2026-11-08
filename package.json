@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "CHOKIDAR_USEPOLLING=true CHOKIDAR_INTERVAL=1000 nuxt dev",
+    "dev": "CHOKIDAR_USEPOLLING=true CHOKIDAR_INTERVAL=1000 nuxt dev --host :: --port 3002",
     "build": "nuxt build",
     "preview": "nuxt preview",
     "generate": "nuxt generate",

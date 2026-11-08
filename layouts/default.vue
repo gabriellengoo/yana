@@ -48,7 +48,7 @@ const links = computed(() => {
 })
 
 const brandStyle = computed(() => ({
-  '--color-brand': settings.value.primaryBrandColour || '#002366'
+  '--color-brand': '#000000'
 }))
 const wordmark = computed(() => {
   const value = settings.value.wordmark

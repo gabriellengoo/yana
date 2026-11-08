@@ -136,7 +136,6 @@ useSeo({
   <div class="home-page">
     <Transition name="intro-fade">
       <section v-if="showIntro" class="intro-page">
-        <img class="intro-page__image" src="/images/yana-opening-placeholder.jpeg" alt="" />
         <IntroAnimation :settings="{ totalDuration: 3300 }" @complete="completeIntro" />
       </section>
     </Transition>

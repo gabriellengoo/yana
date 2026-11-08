@@ -17,7 +17,7 @@ onMounted(() => {
 
   completionTimer = window.setTimeout(() => {
     emit('complete')
-  }, props.settings?.totalDuration ?? 3300)
+  }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 200 : (props.settings?.totalDuration ?? 3300))
 })
 
 onBeforeUnmount(() => {
@@ -26,7 +26,9 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="intro-lockup">
+  <div class="intro-lockup" :style="{ '--intro-duration': `${settings.totalDuration ?? 3300}ms` }">
     <div class="intro-word">yana.</div>
+    <div class="intro-description">Production &amp; creative direction</div>
+    <span class="intro-line" aria-hidden="true" />
   </div>
 </template>
